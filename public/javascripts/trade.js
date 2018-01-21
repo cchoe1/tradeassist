@@ -8,6 +8,18 @@ function transition(element, class_name, time) {
     timeout = setTimeout(remove, time);
     element.classList.add(class_name);
 }
+class ExchangeHistoryComponent {
+    constructor() {
+        this.history_ul = document.querySelector('.exchange-history ul');
+
+    }
+    receive(data) {
+        this.__addTransaction(data);
+    }
+    __addTransaction(data) {
+        this.history_ul.innerHTML = "<li>" + "Asset: " + data.product_id + "<br>" + "Side: " + data.side + "<br>" + "Size: " + data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>" + this.history_ul.innerHTML;
+    }
+}
 class LastPriceComponent {
     constructor() {
         this.btc_price_div = document.querySelector('.btc-price');
@@ -25,64 +37,76 @@ class LastPriceComponent {
     }
     __updatePrice(data) {
         if(data.product_id === "BTC-USD") {
-            let current = parseFloat(this.btc_price_div.innerHTML);
-            let diff = parseFloat(data.price) - current;
-            if(current < parseFloat(data.price)) {
+            let current = Number(this.btc_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
                 transition(this.btc_price_div, "traded-up", 500);
+                transition(this.btc_diff, "traded-up", 500);
             }
-            else if(current > parseFloat(data.price)){
+            else if(current > Number(data.price)){
                 transition(this.btc_price_div, "traded-down", 500);
+                transition(this.btc_diff, "traded-down", 500);
             }
             else {
                 transition(this.btc_price_div, 'traded-neutral', 500);
+                transition(this.btc_diff, 'traded-neutral', 500);
             }
             this.btc_price_div.innerHTML = data.price;
-            this.btc_diff.innerHTML = diff;
+            this.btc_diff.innerHTML = diff.toFixed(2);
         }
         else if(data.product_id === "ETH-USD") {
-            let current = parseFloat(this.eth_price_div.innerHTML);
-            let diff = parseFloat(data.price) - current;
-            if(current < parseFloat(data.price)) {
+            let current = Number(this.eth_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
                 transition(this.eth_price_div, "traded-up", 500);
+                transition(this.eth_diff, "traded-up", 500);
             }
-            else if(current > parseFloat(data.price)){
+            else if(current > Number(data.price)){
                 transition(this.eth_price_div, "traded-down", 500);
+                transition(this.eth_diff, "traded-down", 500);
             }
             else {
                 transition(this.eth_price_div, 'traded-neutral', 500);
+                transition(this.eth_diff, 'traded-neutral', 500);
             }
             this.eth_price_div.innerHTML = data.price;
-            this.eth_diff.innerHTML = diff;
+            this.eth_diff.innerHTML = diff.toFixed(2);
         }
         else if(data.product_id === "LTC-USD") {
-            let current = parseFloat(this.ltc_price_div.innerHTML);
-            let diff = parseFloat(data.price) - current;
-            if(current < parseFloat(data.price)) {
+            let current = Number(this.ltc_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
                 transition(this.ltc_price_div, "traded-up", 500);
+                transition(this.ltc_diff, "traded-up", 500);
             }
-            else if(current > parseFloat(data.price)){
+            else if(current > Number(data.price)){
                 transition(this.ltc_price_div, "traded-down", 500);
+                transition(this.ltc_diff, "traded-down", 500);
             }
             else {
                 transition(this.ltc_price_div, 'traded-neutral', 500);
+                transition(this.ltc_diff, 'traded-neutral', 500);
             }
             this.ltc_price_div.innerHTML = data.price;
-            this.ltc_diff.innerHTML = diff;
+            this.ltc_diff.innerHTML = diff.toFixed(2);
         }
         else if(data.product_id === "BCC-USD") {
-            let current = parseFloat(this.bcc_price_div.innerHTML);
-            let diff = parseFloat(data.price) - current;
-            if(current < parseFloat(data.price)) {
+            let current = Number(this.bcc_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
                 transition(this.bcc_price_div, "traded-up", 500);
+                transition(this.bcc_diff, "traded-up", 500);
             }
-            else if(current > parseFloat(data.price)){
+            else if(current > Number(data.price)){
                 transition(this.bcc_price_div, "traded-down", 500);
+                transition(this.bcc_diff, "traded-down", 500);
             }
             else {
                 transition(this.bcc_price_div, 'traded-neutral', 500);
+                transition(this.bcc_diff, 'traded-neutral', 500);
             }
             this.bcc_price_div.innerHTML = data.price;
-            this.bcc_diff.innerHTML = diff;
+            this.bcc_diff.innerHTML = diff.toFixed(2);
         }
     }
 }
@@ -93,6 +117,8 @@ class SocketClient {
         console.log(this.socket);
         //this.init();
         this.LastPriceComponent = new LastPriceComponent();
+        this.ExchangeHistoryComponent = new ExchangeHistoryComponent();
+
         if (this.socket.readyState === 1) {
             console.log('closed prior');
             this.socket.close();
@@ -122,6 +148,7 @@ class SocketClient {
 
         if(data.type === 'match'){
             this.LastPriceComponent.receive(data);
+            this.ExchangeHistoryComponent.receive(data);
         }
         else if(data.type === 'received'){
             trade_history.innerHTML += "<li>" + "Type: " + data.type + "<br>" + "Order type: " + data.order_type + "<br>" + "Side: " + data.side + "<br>" + "Size: " +  data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>";

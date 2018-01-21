@@ -36,20 +36,24 @@
 .trade-history li {
 	border: 1px solid black;
 }
+.exchange-history {
+	border: 2px solid black;
+	overflow-y: scroll;
+}
 
 /* 
 * Transitions
 *
 */
 .traded-down {
-	transition: background-color 1.5s ease;
+	transition: background-color 1.9s ease;
 	background-color: red;
 }
 .traded-up {
-	transition: background-color 1.5s ease;
+	transition: background-color 1.9s ease;
 	background-color: green;
 }
 .traded-neutral {
-	transition: background-color 1.5s ease;
+	transition: background-color 1.9s ease;
 	background-color: yellow;
 }

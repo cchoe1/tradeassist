@@ -36,11 +36,161 @@ class Logger {
         stream.end();
     }
 }
+class ServerSideRequest {
+    constructor(exchange) {
+        this.https = require('https');
+        this.req;
+        this.options = {};
+        if(exchange === 'GDAX'){
+            this.hostname = 'api.gdax.com';
+        }
+        //this.httpReq = new XMLHttpRequest();
+
+    }
+    setup(type, url, func, args) {
+        func = func || function() { };
+        args = args || [];
+
+        function callbackFunc() {
+            
+        }
+        url = url;
+
+        this.options.hostname = this.hostname;
+        this.options.port = 443;
+        this.options.path = url;
+        this.options.method = type;
+
+
+
+        this.req = this.https.request(this.options, function(res){
+            let response = '';
+            //on('data') receives chunks of the response, must append together
+            res.on('data', (d) => {
+                response = response + d;
+            });
+            //when response ends, callback func is called and full response is sent with it
+            res.on('end', () => {
+                console.log("request ended");
+                func(response);
+            });
+        });
+        this.req.setHeader('Content-Type', 'application/json');
+        this.req.setHeader('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36');
+
+        this.req.on('error', (e) => {
+            console.log("Error with REST API Request...", e);
+        });
+
+
+        
+    }
+    head(opt, val) {
+        this.req.setHeader(opt, val);
+        return this;
+    }
+    send(params){
+        /*params = params || {};
+        params = JSON.stringify(params);
+        this.httpReq.send(params);*/
+        this.req.end();
+
+    }
+}
+
+class GDAXAPI {
+    constructor() {
+        this.request = new ServerSideRequest('GDAX');
+        this.fs = require('fs');
+        this.response = '';
+    }
+    __private(endpoint, method) {
+        var crypto = require('crypto');
+        let data = this.__readConfig();
+
+
+        let timestamp = Date.now() / 1000;
+        let requestPath = endpoint;
+
+        let body, what, key, hmac, final = null;
+
+        if(method === 'GET') {
+            what = timestamp + method + requestPath;
+        }
+        else {
+            body = body;
+            what = timestamp + method + requestPath + body;
+        }
+        key = Buffer(data[0], 'base64');
+        hmac = crypto.createHmac('sha256', key);
+    
+        final = hmac.update(what).digest('base64');
+
+        this.request.head('CB-ACCESS-KEY', data[1]);
+        this.request.head('CB-ACCESS-SIGN', final);
+        this.request.head('CB-ACCESS-TIMESTAMP', timestamp);
+        this.request.head('CB-ACCESS-PASSPHRASE', data[2]);
+
+        return this;
+    }
+    accounts(callback) {
+        callback = callback || function() { };
+        let endpoint = '/accounts';
+        let response = null;
+        //registers callback function
+        this.request.setup('GET', endpoint, this.__callback);
+        this.__private(endpoint, 'GET');
+
+        this.request.send();
+
+
+
+
+    }
+    __callback(res) {
+        console.log("YAY THIS WORKS", res.toString());
+    }
+    __readConfig() {
+        let config_array = [];
+        let config = this.fs.readFileSync('keys.conf', (err, data) => data);
+
+        let configuration = config.toString().split('\n');
+
+        configuration.map(line => {
+            if (line[0] === '#'){
+                return;
+            }
+            else if(line[0] === '\n') {
+                return;
+            }
+            else if(line[0] === '') {
+                return;
+            }
+            else if(line[0] === null) {
+                return;
+            }
+            else if(line[0] === undefined) {
+                return;
+            }
+            else {
+                config_array.push(line.split(' ')[2]);
+            }
+        });
+        /*config_array = config_array.unshift();*/
+        config_array.shift();
+        config_array.shift();
+        config_array.shift();
+        return config_array;
+    }
+
+}
+let lol = new GDAXAPI();
+
+let accounts = lol.accounts();
 // socket specific to GDAX for creating and listening to info
 class GDAXSocket {
     constructor() {
         // Define ws object
-        console.log("creating socket...", this);
         const WebSocket = require('ws');
         this.fs = require('fs');
 
@@ -83,47 +233,58 @@ class GDAXSocket {
 
         return final;
     }
-    __readConfig(config) {
-        config = config.toString().split('\n');
-
+    __readConfig() {
         let config_array = [];
-        config.map(line => {
-            if (line[0] !== '#') {
-                config_array.push(line.split(' ')[2]);
+        let config = this.fs.readFileSync('keys.conf', (err, data) => data);
+
+        let configuration = config.toString().split('\n');
+
+        configuration.map(line => {
+            if (line[0] === '#'){
+                return;
+            }
+            else if(line[0] === '\n') {
+                return;
+            }
+            else if(line[0] === '') {
+                return;
+            }
+            else if(line[0] === null) {
+                return
+            }
+            else if(line[0] === undefined) {
+                return
             }
             else {
-                return;
+                config_array.push(line.split(' ')[2]);
             }
         });
         return config_array;
     }
     private() {
-        let config = this.fs.readFile('./keys.conf', function(err, data){
-            if (err) {
-                throw new Logger(err).error("Config Error");
-            }
-            else {
-                var crypto = require('crypto');
-                data = this.__readConfig(data);
+        var crypto = require('crypto');
+        let data = this.__readConfig();
+        console.log("SHOULD HAVE READ DATA...", data);
 
-                let timestamp = Date.now() / 1000;
-                let requestPath = '/users/self/verify';
-                
-                let method = 'GET';
-                let what = timestamp + method + requestPath;// + body;
-                let key = Buffer(data[0], 'base64');
-                let hmac = crypto.createHmac('sha256', key);
+        //data = this.__readConfig(data);
 
-                let final = hmac.update(what).digest('base64');
+        let timestamp = Date.now() / 1000;
+        let requestPath = '/users/self/verify';
+        
+        let method = 'GET';
+        let what = timestamp + method + requestPath;// + body;
+        let key = Buffer(data[0], 'base64');
+        let hmac = crypto.createHmac('sha256', key);
 
-                this.__sock_message.signature = final;
-                this.__sock_message.key = data[1];
-                this.__sock_message.passphrase = data[2];
-                this.__sock_message.timestamp = timestamp;
-                return this;
+        let final = hmac.update(what).digest('base64');
 
-            }
-        }.bind(this));
+        this.__sock_message.signature = final;
+        this.__sock_message.key = data[1];
+        this.__sock_message.passphrase = data[2];
+        this.__sock_message.timestamp = timestamp;
+
+        return this;
+
     }
     __composeMessage() {
         this.__sock_message = {
@@ -280,4 +441,5 @@ sock.begin();*/
 //module.exports.GDAXSocket;
 module.exports = {
     GDAXSocket: GDAXSocket,
+    GDAXAPI: GDAXAPI,
 }

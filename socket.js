@@ -2,17 +2,20 @@ class WebSocketServer {
     constructor() {
         this.WebSocket = require('ws');
         this.url = require('url');
-        this.socketTools = require('./data.js');
+        this.socketTools = require('./gdax.js');
         
         this.wss = new this.WebSocket.Server({ 'port': 8081 });
 
         this.__init();
     }
+    makeRequest() {
+        this.GDAXAPI = new this.socketTools.GDAXAPI();
+        
+    }
     __handleData(data) {
         var broadcast = function(data) {
             var json = JSON.stringify(data);
             
-            // wss.clients is an array of all connected clients
             this.wss.clients.forEach(function each(client) {
                 client.send(json);
             });
