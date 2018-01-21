@@ -1,6 +1,7 @@
 # tradeassist
 Trading Assist for various cryptocurrencies
- ```_____________________________
+ ```
+ _____________________________
 < You fill a much-needed gap. >
  -----------------------------
         \   ^__^
