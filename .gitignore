@@ -1,0 +1,6 @@
+keys.conf
+key.conf
+history.conf
+*.log
+*.config
+node_modules/

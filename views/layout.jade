@@ -1,0 +1,12 @@
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+        include ./partials/nav
+        div(class="container")
+            block content
+        
+        script(src='/javascripts/ajax.js')
+        script(src="/javascripts/client.js")
