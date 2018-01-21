@@ -3,23 +3,21 @@ class WebSocketServer {
         this.WebSocket = require('ws');
         this.url = require('url');
         this.socketTools = require('./data.js');
-
+        
         this.wss = new this.WebSocket.Server({ 'port': 8081 });
 
         this.__init();
     }
-    handleData(data) {
+    __handleData(data) {
         var broadcast = function(data) {
             var json = JSON.stringify(data);
             
             // wss.clients is an array of all connected clients
             this.wss.clients.forEach(function each(client) {
                 client.send(json);
-                console.log('Sent: ' + json);
             });
         }.bind(this);
-        broadcast(data)
-        // setInterval(broadcast, 3000);
+        broadcast(data);
     }
     __init() {
         this.wss.on('connection', function (ws, req) {
@@ -28,19 +26,35 @@ class WebSocketServer {
             // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
         
             ws.on('message', function incoming(message) {
-                console.log('received: %s', message);
-                console.log('www file is working');
+                console.log('Received from client: %s', message);
             });
-            this.GDAXSocket = new this.socketTools.GDAXSocket();
+            ws.on('error', function () {
+                ws.close();
+                console.log("uh oh! error!");
+            });
+            ws.on('close', function close() {
+                ws.close();
+                ws = null;
+                if(this.GDAXSocket){
+                    this.GDAXSocket.close();
+                }
+                console.log('user has disconnected! bye bye!');
+            }.bind(this));
 
-            this.GDAXSocket.private();
-            this.GDAXSocket.sub('user', ['BTC-USD', 'LTC-USD', 'ETH-USD', 'ETH-BTC', 'LTC-BTC']);
-            this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD"]);
-            this.GDAXSocket.setup();
+            this.startGDAX();
             
-            //this.GDAXSocket.begin();
-            this.GDAXSocket.beginAndListen(this.handleData.bind(this));
         }.bind(this));
+    }
+    startGDAX() {
+        this.GDAXSocket = new this.socketTools.GDAXSocket();
+        
+        this.GDAXSocket.private();
+        this.GDAXSocket.sub('user', ['BTC-USD', 'LTC-USD', 'ETH-USD', 'ETH-BTC', 'LTC-BTC']);
+        this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD"]);
+        this.GDAXSocket.setup();
+        
+        //this.GDAXSocket.begin();
+        this.GDAXSocket.beginAndListen(this.__handleData.bind(this));
     }
 }
 

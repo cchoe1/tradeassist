@@ -26,6 +26,9 @@ app.use(function (req, res) {
 
 var server = http.createServer(app);
 
+// require in the WebSocketServer module which sets up the websocket backend server
+//  WebSocketServer() also implements the back-end client servers which pull data from exchanges
+//  all data is routed through WebSocketServer before it is either parsed 
 var WSS = require('../socket.js');
 const wss = new WSS.WebSocketServer();
 

@@ -1,13 +1,35 @@
 extends /layout
 
 block content
+	link(rel='stylesheet', href='/stylesheets/trade.css')
+
 	h1= title
 	
-	div(class="btc-price")
-	div(class="eth-price")
-	div(class="ltc-price")
-	div(class="bcc-price")
-		
+	div(class="row")
+		div(class="last-trades")
+			h2 Last Traded Prices
+			div(class="row")
+				h3 BTC : $
+				div(class="btc-price")
+				span(class="btc-diff")
+			div(class="row")
+				h3 ETH : $
+				div(class="eth-price")
+				span(class="eth-diff")
+			div(class="row")
+				h3 LTC : $
+				div(class="ltc-price")
+				span(class="ltc-diff")
+			div(class="row")
+				h3 BCC : $
+				div(class="bcc-price")
+				span(class="bcc-diff")
+	
+		div(class="trade-history")
+			h2 Trade History
+			ul
+
+
 	div(class="form-group")
 		input(type="text" class="hello")
 		input(type="text" class="hello")

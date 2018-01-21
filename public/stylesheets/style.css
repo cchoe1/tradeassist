@@ -1,3 +1,10 @@
+/********************************** 
+*  style.css - stylesheet for general css elements
+*
+*
+*
+*
+**********************************/
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -5,4 +12,15 @@ body {
 
 a {
   color: #00B7FF;
+}
+
+nav {
+	border: 1px solid black;
+	display: flex;
+	flex-direction: row;
+}
+nav a {
+	flex: 1 1 0;
+	border: 1px solid gray;
+	text-align: center;
 }

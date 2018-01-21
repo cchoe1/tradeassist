@@ -1,0 +1,55 @@
+/********************************** 
+*  trade.css - stylesheet for trade page
+*
+*
+*
+*
+**********************************/
+.row {
+	display: flex;
+	flex-direction: row;
+}
+.row div{
+	height: 400px;
+	width: 33%;
+	border: 2px solid black;
+}
+.last-trades {
+	display: flex;
+	flex-direction: column;
+	border: 2px solid black;
+}
+.last-trades div {
+	border: 1px solid black;
+	height: 60px;
+	width: 100%;
+	font-size: 14px;
+}
+.last-trades span {
+	width: 30%;
+	border: 1px solid black;
+}
+.trade-history {
+	overflow-y: scroll;
+
+}
+.trade-history li {
+	border: 1px solid black;
+}
+
+/* 
+* Transitions
+*
+*/
+.traded-down {
+	transition: background-color 1.5s ease;
+	background-color: red;
+}
+.traded-up {
+	transition: background-color 1.5s ease;
+	background-color: green;
+}
+.traded-neutral {
+	transition: background-color 1.5s ease;
+	background-color: yellow;
+}

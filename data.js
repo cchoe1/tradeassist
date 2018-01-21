@@ -1,3 +1,4 @@
+// useless logger class that might one day not be useless
 class Logger {
     constructor(message) {
         this.fs = require('fs');
@@ -35,10 +36,11 @@ class Logger {
         stream.end();
     }
 }
-
+// socket specific to GDAX for creating and listening to info
 class GDAXSocket {
     constructor() {
         // Define ws object
+        console.log("creating socket...", this);
         const WebSocket = require('ws');
         this.fs = require('fs');
 
@@ -49,12 +51,25 @@ class GDAXSocket {
         this.products;
         this.channels = [];
     }
+    close() {
+        this.webSock.close();
+    }
     sub(channel, products) {
-        let final = new Array;
-
         let channel_obj = this.__channelFactory(channel, products);
-        this.channels.push(channel_obj)
-
+        let add = true;
+        let check = JSON.stringify(channel_obj);
+        this.channels.forEach(function(chan){
+            let temp = JSON.stringify(chan);
+            if(temp === check) {
+                add = false;
+            }
+            else {
+                return;
+            }
+        });
+        if(add === true) {
+            this.channels.push(channel_obj);
+        }
         return this;
     }
     __channelFactory(name, products) {
@@ -120,6 +135,7 @@ class GDAXSocket {
         return this;
     }
     setup() {
+        this.__sock_message = {};
         this.__composeMessage();
         return this;
 
@@ -139,15 +155,21 @@ class GDAXSocket {
         }.bind(this));
     }
     beginAndListen(callback) {
-        function func(data) {
+        let stream = new StreamHandler();
+        //the fork in the road -- one data stream goes to the front end and the other stays in the back end
+        //  to be used further
+        function router(data) {
+            // callback() is supplied from the Web Server that calls this func - used fo front end
             callback(data);
+
+            // StreamHandler() is used by the back end
+            stream.listen(data);
         }
         console.log("Began and listening...", this.__sock_message);
         this.webSock.on('open', function open() {
             try{
                 this.webSock.send(JSON.stringify(this.__sock_message));
-                let stream = new StreamHandler();
-                this.webSock.on('message', data => func(data));
+                this.webSock.on('message', data => router(data));
             }
             catch(e) {
                 console.log("ERROR! Appended to log", e);
@@ -156,7 +178,6 @@ class GDAXSocket {
         }.bind(this))
     }
     __responseHandler(data) {
-        console.log("response handler worked...");
         return data;
     }
 }
@@ -176,8 +197,14 @@ class StreamHandler {
             if (data.type === "match") {
                 this.marketPriceManager.updatePrice(data);
             }
-            else {
+            else if(data.type === 'open' ||
+                    data.type === 'received' ||
+                    data.type === 'done'){
                 this.userHistoryManager.receive(data);
+            }
+            else if(data.type === 'last_match' ||
+                    data.type === 'subscribe') {
+                //console.log("Some info: ", data);
             }
             return data;
         }
@@ -223,7 +250,7 @@ class UserHistory {
     }
     receive(object) {
         console.log('Received: ', object);
-        let stream = this.fs.createWriteStream('history.txt', {flags:'a'});
+        let stream = this.fs.createWriteStream('history.conf', {flags:'a'});
         stream.write(JSON.stringify(object) + "\n");
         stream.end();
     }
@@ -253,6 +280,4 @@ sock.begin();*/
 //module.exports.GDAXSocket;
 module.exports = {
     GDAXSocket: GDAXSocket,
-    StreamHandler: StreamHandler,
-    Logger: Logger
 }
