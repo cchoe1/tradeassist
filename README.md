@@ -18,7 +18,7 @@ Trade Assist is capable of syncing up to GDAX's Websocket feed and receive real-
 
 In order for this to work properly, please ensure that this software is running whenever you are trading on GDAX.  You can find more detailed instructions on installation below:
 
-If you would like to contribute or fix any bugs, please fork off this repository and make your changes on a new branch and submit a pull request with that branch.
+If you would like to contribute or fix any bugs, please fork off this repository and make your changes on a new branch and submit a pull request with that branch.  Submit any issues or bugs you may find to the 'Issues' page on this Github repository or send me an e-mail at calvinchoe1@gmail.com.
 
 Some configuration is required.  Please check under the Installation section for more information.
 
@@ -26,20 +26,24 @@ Some configuration is required.  Please check under the Installation section for
 
 This package is a NodeJS project and requires NodeJS and npm (node package manager) to be installed on your machine.  Please ensure these are on your system before proceeding.
 
-1.  `git clone https://github.com/cchoe1/tradeassist`
+1.  `git clone https://github.com/cchoe1/tradeassist` to clone this repository
 
-2.  `npm install`
+2.  `cd tradeassist/`
 
-3.  Edit configuration files and follow instructions within (requires API keys from GDAX)
+3.  `npm install` to install necessary dependencies
 
-4.  Once configuration is set, run `npm start` to initialize the UI
+4.  Edit configuration files and follow instructions within (requires API keys from GDAX)
 
-5.  Access UI at `http://localhost:3000`
+5.  Once configuration is set, run `npm start` to initialize the UI
+
+6.  Access UI at `http://localhost:3000`
 
 # FURTHER NOTES
 
-Public facing interfaces may be created through the use of VirtualHost configuration and port forwarding.  Please be advised that this system may not be entirely secured at the time of this writing and that you should be cautious when opening ports that allows you to connect to this UI from the outside internet.  With a default installation, your UI is automatically separated from the outside world and mostly secure.  Please understand the risks of doing so.
+Public facing interfaces may be created through the use of VirtualHost configuration and port forwarding.  Please be advised that this system may not be entirely secured at the time of this writing and that you should be cautious when opening ports that allows you to connect to this UI from the outside internet.  With a default installation, your UI is automatically separated from the outside world and mostly secure.  Please understand the risks of port forwarding and opening your internet to the outside world.  This software will recognize changes to your account and run seamlessly despite your being outside of the local network so it is not entirely necessary to open this interface to the public internet.
 
 # TERMS AND CONDITIONS
 
-This software is presented and provided as is.  I will do my best to ensure stable releases and bug-free environments but I cannot be liable for any losses you incur while using this software.  Misuse of this software may result in tangible financial losses.  Please be advised of the risks when dealing with cryptocurrencies and please be aware that this involves **REAL money**.  Please make educated decisions when engaging in the buying and selling of cryptocurrencies.
+This software is presented and provided as is.  I will do my best to ensure stable releases and bug-free environments but I cannot be liable for any losses you incur while using this software.  Misuse of this software may result in tangible financial losses.  Please be advised of the risks when dealing with cryptocurrencies and please be aware that this involves **REAL money**.  Cryptocurrencies may be subject to **extreme volatility** and **phases of low liquidity** -- PLEASE UNDERSTAND THESE RISKS.
+
+Please be aware that any existing trades may be cancelled if your internet connection to GDAX is lost. Some orders may exist within GDAX itself and some orders may only exist on your local machine, not having yet been pushed to GDAX.  You should ensure that this software continually runs in the background if you wish to have any special orders in your pipeline and this software cannot do anything in the event of failure on GDAX's end.  I am not liable for any mishandling, misuse, or other actions that may lead to financial losses.  Please exercise caution and make educated decisions when using this program.

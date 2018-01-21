@@ -10,9 +10,7 @@ class WebSocketServer {
     }
     handleData(data) {
         var broadcast = function(data) {
-            var json = JSON.stringify({
-                message: data
-            });
+            var json = JSON.stringify(data);
             
             // wss.clients is an array of all connected clients
             this.wss.clients.forEach(function each(client) {
@@ -33,7 +31,6 @@ class WebSocketServer {
                 console.log('received: %s', message);
                 console.log('www file is working');
             });
-            // Every three seconds broadcast "{ message: 'Hello hello!' }" to all connected clients
             this.GDAXSocket = new this.socketTools.GDAXSocket();
 
             this.GDAXSocket.private();
@@ -50,9 +47,6 @@ class WebSocketServer {
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-
-
 
 module.exports = {
     WebSocketServer: WebSocketServer
