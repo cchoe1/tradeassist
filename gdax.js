@@ -29,7 +29,6 @@ class Logger {
         let separator = '---------';
         let timestamp = Date(Date.now()).toString();
         let log = this.start + "\n" + "- " + timestamp + ", " + `<<${this.name}>>` + "\n" + message + "\n" + this.end + "\n";
-        console.log(log);
 
         let stream = this.fs.createWriteStream('errors.log', {flags:'a'});
         stream.write(log);
@@ -82,18 +81,16 @@ class ServerSideRequest {
             console.log("Error with REST API Request...", e);
         });
 
-
-        
     }
     head(opt, val) {
         this.req.setHeader(opt, val);
         return this;
     }
     send(params){
-        /*params = params || {};
+        params = params || {};
         params = JSON.stringify(params);
-        this.httpReq.send(params);*/
-        this.req.end();
+        //this.httpReq.send(params);
+        this.req.end(params);
 
     }
 }
@@ -104,7 +101,8 @@ class GDAXAPI {
         this.fs = require('fs');
         this.response = '';
     }
-    __private(endpoint, method) {
+    __private(endpoint, method, body) {
+        body = JSON.stringify(body) || '';
         var crypto = require('crypto');
         let data = this.__readConfig();
 
@@ -112,13 +110,13 @@ class GDAXAPI {
         let timestamp = Date.now() / 1000;
         let requestPath = endpoint;
 
-        let body, what, key, hmac, final = null;
+        let what, key, hmac, final = null;
 
         if(method === 'GET') {
             what = timestamp + method + requestPath;
         }
         else {
-            body = body;
+            //let msg = JSON.stringify(body);
             what = timestamp + method + requestPath + body;
         }
         key = Buffer(data[0], 'base64');
@@ -133,17 +131,31 @@ class GDAXAPI {
 
         return this;
     }
+    order(side, price, amount, product_id, callback) {
+        callback = callback || function() { };
+
+        let msg = {
+            size: amount,
+            price: price,
+            side: side,
+            type: 'limit',
+            product_id: product_id
+        };
+        let endpoint = '/orders';
+        this.request.setup('POST', endpoint, callback);
+        this.__private(endpoint, 'POST', msg);
+
+        this.request.send(msg);
+    }
     accounts(callback) {
         callback = callback || function() { };
+
         let endpoint = '/accounts';
-        let response = null;
-        //registers callback function
-        this.request.setup('GET', endpoint, this.__callback);
+
+        this.request.setup('GET', endpoint, callback);
         this.__private(endpoint, 'GET');
 
         this.request.send();
-
-
 
 
     }
@@ -176,7 +188,6 @@ class GDAXAPI {
                 config_array.push(line.split(' ')[2]);
             }
         });
-        /*config_array = config_array.unshift();*/
         config_array.shift();
         config_array.shift();
         config_array.shift();
@@ -184,9 +195,7 @@ class GDAXAPI {
     }
 
 }
-let lol = new GDAXAPI();
 
-let accounts = lol.accounts();
 // socket specific to GDAX for creating and listening to info
 class GDAXSocket {
     constructor() {
@@ -220,6 +229,7 @@ class GDAXSocket {
         if(add === true) {
             this.channels.push(channel_obj);
         }
+
         return this;
     }
     __channelFactory(name, products) {
@@ -235,7 +245,7 @@ class GDAXSocket {
     }
     __readConfig() {
         let config_array = [];
-        let config = this.fs.readFileSync('keys.conf', (err, data) => data);
+        let config = this.fs.readFileSync('./keys.conf', (err, data) => data);
 
         let configuration = config.toString().split('\n');
 
@@ -264,7 +274,6 @@ class GDAXSocket {
     private() {
         var crypto = require('crypto');
         let data = this.__readConfig();
-        console.log("SHOULD HAVE READ DATA...", data);
 
         //data = this.__readConfig(data);
 
@@ -278,6 +287,7 @@ class GDAXSocket {
 
         let final = hmac.update(what).digest('base64');
 
+
         this.__sock_message.signature = final;
         this.__sock_message.key = data[1];
         this.__sock_message.passphrase = data[2];
@@ -287,34 +297,22 @@ class GDAXSocket {
 
     }
     __composeMessage() {
-        this.__sock_message = {
+        /*this.__sock_message = {
             "type": "subscribe",
-            "product_ids": this.products,
+            //"product_ids": this.products,
             "channels": this.channels
-        }
-        console.log(this.__sock_message);
+        }*/
+        this.__sock_message.type = 'subscribe';
+        this.__sock_message.channels = this.channels;
         return this;
     }
     setup() {
-        this.__sock_message = {};
+        //this.__sock_message = {};
         this.__composeMessage();
         return this;
 
     }
-    begin() {
-        console.log(this.__sock_message);
-        this.webSock.on('open', function open() {
-            try{
-                this.webSock.send(JSON.stringify(this.__sock_message));
-                let stream = new StreamHandler();
-                this.webSock.on('message', data => stream.listen(data));
-            }
-            catch(e) {
-                console.log("ERROR! Appended to log", e);
-                new Logger(e).socketError();
-            }
-        }.bind(this));
-    }
+    
     beginAndListen(callback) {
         let stream = new StreamHandler();
         //the fork in the road -- one data stream goes to the front end and the other stays in the back end
@@ -397,9 +395,9 @@ class MarketPrice {
             this.LTC = data.price;
             console.log("LTC = $", this.LTC);
         }
-        else if (coin === "BCC-USD") {
+        else if (coin === "BCH-USD") {
             this.BCC = data.price;
-            console.log("BCC = $", this.BCC);
+            console.log("BCH = $", this.BCC);
         }
     }
 
@@ -410,7 +408,6 @@ class UserHistory {
         this.fs = require('fs');
     }
     receive(object) {
-        console.log('Received: ', object);
         let stream = this.fs.createWriteStream('history.conf', {flags:'a'});
         stream.write(JSON.stringify(object) + "\n");
         stream.end();

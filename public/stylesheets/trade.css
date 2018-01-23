@@ -5,11 +5,17 @@
 *
 *
 **********************************/
-.row {
+
+/* 
+	BODY
+ */
+.trade-body {
+	width: 80%;
+	margin-left: 20%;
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 }
-.row div{
+.trade-body div.row .component {
 	height: 400px;
 	width: 33%;
 	border: 2px solid black;
@@ -19,16 +25,19 @@
 	flex-direction: column;
 	border: 2px solid black;
 }
-.last-trades div {
-	border: 1px solid black;
-	height: 60px;
+.last-trades div.row{
+	display: flex;
+	justify-content: space-evenly;
 	width: 100%;
-	font-size: 14px;
 }
-.last-trades span {
+.last-trades div.row div{
+	font-size: 14px;
+	align-self: center;
+}
+/* .last-trades span {
 	width: 30%;
 	border: 1px solid black;
-}
+} */
 .trade-history {
 	overflow-y: scroll;
 
@@ -39,6 +48,52 @@
 .exchange-history {
 	border: 2px solid black;
 	overflow-y: scroll;
+}
+
+
+/* 
+	Trade window
+ */
+.trade-window{
+	border: 1px solid black;
+	display: flex;
+	flex-direction: column;
+	max-height: 100vh
+	overflow-y: scroll;
+	width: 18%;
+	position: fixed;
+	background-color: #999;
+	margin-top: 20px;
+	z-index: 99999;
+}
+.trade-window .row{
+	justify-content: space-between;
+}
+.trade-window input{
+	width: 120px;
+	align-self: right;
+}
+.trade-window label {
+
+}
+.dropdown, .coin-choice {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+.dropdown input, .coin-choice input{
+	width: 30px;
+	height: 30px;
+	align-self: center;
+	border: 1px solid black;
+}
+.dropdown label, .coin-choice label{
+	align-self: center;
+	width: 40px;
+}
+.coin-choice div {
+	font-size: 8pt;
+	align-self: center;
 }
 
 /* 

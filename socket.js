@@ -10,7 +10,7 @@ class WebSocketServer {
     }
     makeRequest() {
         this.GDAXAPI = new this.socketTools.GDAXAPI();
-        
+
     }
     __handleData(data) {
         var broadcast = function(data) {
@@ -21,6 +21,7 @@ class WebSocketServer {
             });
         }.bind(this);
         broadcast(data);
+
     }
     __init() {
         this.wss.on('connection', function (ws, req) {
@@ -52,8 +53,8 @@ class WebSocketServer {
         this.GDAXSocket = new this.socketTools.GDAXSocket();
         
         this.GDAXSocket.private();
-        this.GDAXSocket.sub('user', ['BTC-USD', 'LTC-USD', 'ETH-USD', 'ETH-BTC', 'LTC-BTC']);
-        this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD"]);
+        this.GDAXSocket.sub('user', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD", "ETH-BTC", "LTC-BTC", "BCH-BTC"]);
+        this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD"]);
         this.GDAXSocket.setup();
         
         //this.GDAXSocket.begin();

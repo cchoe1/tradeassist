@@ -38,9 +38,21 @@ This package is a NodeJS project and requires NodeJS and npm (node package manag
 
 6.  Access UI at `http://localhost:3000`
 
+# HOW TO USE THIS SOFTWARE
+
+(Subject to change, this is kind of my outline)
+
+Tradeassist is NOT (currently) autonomous--in other words, this software will not automatically trade for you.  It is up to you to set directives and use the tools provided.  This software represents a toolset that enhances your trading on an exchange such as GDAX.  
+
+Tradeassist provides tools such as more complex orders, taker fee dodger, portfolio trackers, and more.  The ultimate goal of Tradeassist is to get you away from staring at tickers all day long and doing more productive things with your time, while also translating the logic of your trading strategy into simple directives and orders.  In short, Tradeassist's goal is to make your trading more efficient.
+
+##Advanced Orders (Coming Soon)
+
+Tradeassist comes with advanced orders which allow you to make more sophisticated orders besides the traditional market, limit, or stop loss/limit.  Primitive logic statements can be used in conjunction with a set of filtering and analysis tools to make better trades without the need for constant attention.  
+
 # FURTHER NOTES
 
-Public facing interfaces may be created through the use of VirtualHost configuration and port forwarding.  Please be advised that this system may not be entirely secured at the time of this writing and that you should be cautious when opening ports that allows you to connect to this UI from the outside internet.  With a default installation, your UI is automatically separated from the outside world and mostly secure.  Please understand the risks of port forwarding and opening your internet to the outside world.  This software will recognize changes to your account and run seamlessly despite your being outside of the local network so it is not entirely necessary to open this interface to the public internet.
+Public facing interfaces may be created through the use of port forwarding.  Please be advised that this system may not be entirely secured at the time of this writing and that you should be cautious when opening ports that allows you to connect to this UI from the outside internet.  With a default installation, your UI is automatically separated from the outside world and mostly secure.  Please understand the risks of port forwarding and opening your internet to the outside world.  This software will recognize changes to your account and run seamlessly despite your being outside of the local network so it is not entirely necessary to open this interface to the public internet.
 
 # TERMS AND CONDITIONS
 

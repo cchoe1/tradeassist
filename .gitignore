@@ -4,3 +4,4 @@ history.conf
 *.log
 *.config
 node_modules/
+todo.txt

@@ -10,27 +10,61 @@ function transition(element, class_name, time) {
 }
 class ExchangeHistoryComponent {
     constructor() {
-        this.history_ul = document.querySelector('.exchange-history ul');
+        this.history_ul = document.querySelector('.exchange-history ol');
+        this.length = 1000;
+        this.tx_list = [];
 
     }
     receive(data) {
         this.__addTransaction(data);
+        //this.__displayTransactions();
     }
     __addTransaction(data) {
         this.history_ul.innerHTML = "<li>" + "Asset: " + data.product_id + "<br>" + "Side: " + data.side + "<br>" + "Size: " + data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>" + this.history_ul.innerHTML;
+        
+        /*this.tx_list.unshift(data);
+        let length = this.tx_list.length;
+
+        if(length > this.length) {
+            this.tx_list.pop();
+        }*/
+
+
+    }
+    __displayTransactions() {
+        this.history_ul.innerHTML = '';
+
+        this.tx_list.forEach(function(tx){
+            /*this.history_ul.innerHTML = "<li>" + "Asset: " + tx.product_id + "<br>" + "Side: " + tx.side + "<br>" + "Size: " + tx.size + "<br>" + "Price: " + tx.price + "<br>" + "</li>" + this.history_ul.innerHTML;*/
+            this.history_ul.innerHTML += "<li>" + "Asset: " + tx.product_id + "<br>" + "Side: " + tx.side + "<br>" + "Size: " + tx.size + "<br>" + "Price: " + tx.price + "<br>" + "</li>";
+        
+        }.bind(this));
     }
 }
 class LastPriceComponent {
     constructor() {
+
         this.btc_price_div = document.querySelector('.btc-price');
         this.eth_price_div = document.querySelector('.eth-price');
         this.ltc_price_div = document.querySelector('.ltc-price');
-        this.bcc_price_div = document.querySelector('.bcc-price');
+        this.bch_price_div = document.querySelector('.bch-price');
 
         this.btc_diff = document.querySelector(".btc-diff")
         this.eth_diff = document.querySelector(".eth-diff")
         this.ltc_diff = document.querySelector(".ltc-diff")
-        this.bcc_diff = document.querySelector(".bcc-diff")
+        this.bch_diff = document.querySelector(".bch-diff")
+
+        this.btc_bal = document.querySelector('.btc-balance');
+        this.eth_bal = document.querySelector('.eth-balance');
+        this.ltc_bal = document.querySelector('.ltc-balance');
+        this.bch_bal = document.querySelector('.bch-balance');
+
+        this.btc_worth = document.querySelector('.btc-worth');
+        this.eth_worth = document.querySelector('.eth-worth');
+        this.ltc_worth = document.querySelector('.ltc-worth');
+        this.bch_worth = document.querySelector('.bch-worth');
+
+        console.log("AHHHH", this);
     }
     receive(data) {
         this.__updatePrice(data);
@@ -39,6 +73,8 @@ class LastPriceComponent {
         if(data.product_id === "BTC-USD") {
             let current = Number(this.btc_price_div.innerHTML);
             let diff = Number(data.price) - current;
+
+
             if(current < Number(data.price)) {
                 transition(this.btc_price_div, "traded-up", 500);
                 transition(this.btc_diff, "traded-up", 500);
@@ -51,6 +87,7 @@ class LastPriceComponent {
                 transition(this.btc_price_div, 'traded-neutral', 500);
                 transition(this.btc_diff, 'traded-neutral', 500);
             }
+            this.btc_worth.innerHTML = "$" + (Number(this.btc_bal.innerHTML) * Number(data.price)).toFixed(4);
             this.btc_price_div.innerHTML = data.price;
             this.btc_diff.innerHTML = diff.toFixed(2);
         }
@@ -69,6 +106,7 @@ class LastPriceComponent {
                 transition(this.eth_price_div, 'traded-neutral', 500);
                 transition(this.eth_diff, 'traded-neutral', 500);
             }
+            this.eth_worth.innerHTML = "$" + (Number(this.eth_bal.innerHTML) * Number(data.price)).toFixed(4);
             this.eth_price_div.innerHTML = data.price;
             this.eth_diff.innerHTML = diff.toFixed(2);
         }
@@ -87,27 +125,123 @@ class LastPriceComponent {
                 transition(this.ltc_price_div, 'traded-neutral', 500);
                 transition(this.ltc_diff, 'traded-neutral', 500);
             }
+            this.ltc_worth.innerHTML = "$" + (Number(this.ltc_bal.innerHTML) * Number(data.price)).toFixed(4);
             this.ltc_price_div.innerHTML = data.price;
             this.ltc_diff.innerHTML = diff.toFixed(2);
         }
-        else if(data.product_id === "BCC-USD") {
-            let current = Number(this.bcc_price_div.innerHTML);
+        else if(data.product_id === "BCH-USD") {
+            let current = Number(this.bch_price_div.innerHTML);
             let diff = Number(data.price) - current;
             if(current < Number(data.price)) {
-                transition(this.bcc_price_div, "traded-up", 500);
-                transition(this.bcc_diff, "traded-up", 500);
+                transition(this.bch_price_div, "traded-up", 500);
+                transition(this.bch_diff, "traded-up", 500);
             }
             else if(current > Number(data.price)){
-                transition(this.bcc_price_div, "traded-down", 500);
-                transition(this.bcc_diff, "traded-down", 500);
+                transition(this.bch_price_div, "traded-down", 500);
+                transition(this.bch_diff, "traded-down", 500);
             }
             else {
-                transition(this.bcc_price_div, 'traded-neutral', 500);
-                transition(this.bcc_diff, 'traded-neutral', 500);
+                transition(this.bch_price_div, 'traded-neutral', 500);
+                transition(this.bch_diff, 'traded-neutral', 500);
             }
-            this.bcc_price_div.innerHTML = data.price;
-            this.bcc_diff.innerHTML = diff.toFixed(2);
+            this.bch_worth.innerHTML = "$" + (Number(this.bch_bal.innerHTML) * Number(data.price)).toFixed(4);
+            this.bch_price_div.innerHTML = data.price;
+            this.bch_diff.innerHTML = diff.toFixed(2);
         }
+    }
+}
+
+
+let test_btn = document.querySelector('.test');
+test_btn.addEventListener('click', function(event){
+    let request = new AjaxRequest();
+    request.setup('GET', 'http://localhost:3000/trade/api/accounts', function(data){
+        let feedback = document.querySelector('.feedback');
+        feedback.innerHTML = JSON.stringify(data);
+    });
+    request.send();
+});
+
+class TradeWindowComponent {
+    constructor() {
+        this.submit_order = document.querySelector('.submit-order');
+        this.message = {};
+        this.order_side_radio = document.getElementsByName('side');
+        this.order_choice_radio = document.getElementsByName('coin-choice');
+
+        this.btc_price = Number(document.querySelector('.btc-price').value);
+        this.eth_price = Number(document.querySelector('.eth-price').value);
+        this.ltc_price = Number(document.querySelector('.ltc-price').value);
+        this.bch_price = Number(document.querySelector('.bch-price').value);
+
+        this.addEvents();
+        this.__updateBalances();
+    }
+    __grabFormValues() {
+        this.order_price = document.querySelector('input.order-price').value;
+        this.order_amount = document.querySelector('.order-amount').value;
+
+        this.message.size = this.order_amount;
+        this.message.price = this.order_price;
+
+
+        for(let i=0, length=this.order_side_radio.length; i<length; i++) {
+            if(this.order_side_radio[i].checked) {
+                let order_side = this.order_side_radio[i].value;
+                this.message.side = order_side;
+            }
+        }
+        for(let i=0, length=this.order_choice_radio.length; i<length; i++) {
+            if(this.order_choice_radio[i].checked) {
+                let order_choice = this.order_choice_radio[i].value;
+                this.message.product_id = order_choice;
+            }
+        }
+    }
+    addEvents() {
+        this.submit_order.addEventListener('click', this.__submitTrade.bind(this));
+    }
+    __submitTrade() {
+        this.__grabFormValues();
+        let request = new AjaxRequest();
+        request.setup('POST', 'http://localhost:3000/trade/api/order', function(data){
+            console.log(data);
+        });
+        request.send(this.message);
+
+        this.__updateBalances();
+    }
+    __updateBalances() {
+        let request = new AjaxRequest();
+        let btc_bal = document.querySelector('.btc-balance');
+        let eth_bal = document.querySelector('.eth-balance');
+        let ltc_bal = document.querySelector('.ltc-balance');
+        let bch_bal = document.querySelector('.bch-balance');
+        let money_bal = document.querySelector('.money-balance')
+
+        request.setup('GET', 'http://localhost:3000/trade/api/accounts', function(data){
+            console.log('Returned balances: ', data)
+            data = JSON.parse(data);
+            data.forEach(function(d){
+                if(d.currency === "BTC"){
+                    btc_bal.innerHTML = d.balance;
+                    let btc_worth = Number(d.balance) * Number
+                }
+                else if (d.currency === "ETH") {
+                    eth_bal.innerHTML = d.balance;
+                }
+                else if (d.currency === "LTC") {
+                    ltc_bal.innerHTML = d.balance;
+                }
+                else if (d.currency === "BCH") {
+                    bch_bal.innerHTML = d.balance;
+                }
+                else if (d.currency === "USD") {
+                    money_bal.innerHTML = "$" + Number(d.balance).toFixed(4);
+                }
+            });
+        });
+        request.send();
     }
 }
 class SocketClient {
@@ -116,13 +250,10 @@ class SocketClient {
         this.socket = new WebSocket('ws://localhost:8081/');
         console.log(this.socket);
         //this.init();
+        this.TradeWindow = new TradeWindowComponent();
         this.LastPriceComponent = new LastPriceComponent();
         this.ExchangeHistoryComponent = new ExchangeHistoryComponent();
 
-        if (this.socket.readyState === 1) {
-            console.log('closed prior');
-            this.socket.close();
-        }
     }
     init() {
         this.socket.onopen = this.__onOpen.bind(this);
@@ -142,19 +273,23 @@ class SocketClient {
     }
     __onMessage(event) {
         let data = JSON.parse(JSON.parse(event.data));
-        console.log(data);
 
         let trade_history = document.querySelector('.trade-history ul');
 
+        if(data.type !== 'match'){
+            console.log(data);
+        }
         if(data.type === 'match'){
             this.LastPriceComponent.receive(data);
             this.ExchangeHistoryComponent.receive(data);
         }
         else if(data.type === 'received'){
+            console.log("@@@@@@@@@@@@@@@@@@@@\n\n\n@@@@@@@@@@@@@@@@@\n\n\n", data);
             trade_history.innerHTML += "<li>" + "Type: " + data.type + "<br>" + "Order type: " + data.order_type + "<br>" + "Side: " + data.side + "<br>" + "Size: " +  data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>";
         }
         else if(data.type === 'done' ||
                 data.type === 'open') {
+            console.log("@@@@@@@@@@@@@@@@@@@@\n\n\n@@@@@@@@@@@@@@@@@\n\n\n", data);
             trade_history.innerHTML += "<li>" + 'Type: ' + data.type + "<br>" + "Side: " + data.side + "<br>" + "Price point: " + data.price + "<br>" + "Remaining size: " + data.remaining_size + "<br>" + "Reason: " + data.reason + "</li>";
         }
     }
@@ -171,8 +306,39 @@ class SocketClient {
 
 
 
+/*
+* MAIN
+*
+*
+*
+*/
 
 let client = new SocketClient();
 client.init();
 
-console.log(document);
+//submit_order.addEventListener('click', function(event){
+    
+    // let order_side = document.querySelector('.dropdown').value;
+
+    
+    //console.log(order_side);
+
+    
+    //console.log(order_choice_radio);
+    /*order_choice_radio.forEach(function(radio){
+        console.log("@@@", message);
+    }.bind(message));*/
+    //let order_choice = document.querySelector('.coin-choice').value;
+
+    //console.log(order_price, order_amount, order_side);
+    /*message = {
+        size: order_amount,
+        price: order_price,
+        //side: order_side,
+        //product_id: order_choice,
+    }*/
+    
+    console.log("The msg: ", message);
+    
+/*
+});*/
