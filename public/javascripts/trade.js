@@ -4,9 +4,19 @@ function transition(element, class_name, time) {
     }
     let timeout = null;
     clearTimeout(timeout);
-    //timeout = setTimeout(() => element.classList.remove(class_name), time);
     timeout = setTimeout(remove, time);
     element.classList.add(class_name);
+}
+let $ = function(selector) {
+
+}
+class AdvancedOrder {
+    constructor() {
+        
+    }
+}
+class Persister {
+
 }
 class ExchangeHistoryComponent {
     constructor() {
@@ -58,11 +68,14 @@ class LastPriceComponent {
         this.eth_bal = document.querySelector('.eth-balance');
         this.ltc_bal = document.querySelector('.ltc-balance');
         this.bch_bal = document.querySelector('.bch-balance');
+        this.money_bal = document.querySelector('.money-balance');
 
         this.btc_worth = document.querySelector('.btc-worth');
         this.eth_worth = document.querySelector('.eth-worth');
         this.ltc_worth = document.querySelector('.ltc-worth');
         this.bch_worth = document.querySelector('.bch-worth');
+
+        this.portfolio_worth = document.querySelector('.portfolio-worth');
 
         console.log("AHHHH", this);
     }
@@ -148,19 +161,11 @@ class LastPriceComponent {
             this.bch_price_div.innerHTML = data.price;
             this.bch_diff.innerHTML = diff.toFixed(2);
         }
+
+        let total_val = Number(this.btc_worth.innerHTML.substr(1)) + Number(this.eth_worth.innerHTML.substr(1)) + Number(this.ltc_worth.innerHTML.substr(1)) + Number(this.bch_worth.innerHTML.substr(1)) + Number(this.money_bal.innerHTML.substr(1));
+        this.portfolio_worth.innerHTML = "$" + total_val.toFixed(4);
     }
 }
-
-
-let test_btn = document.querySelector('.test');
-test_btn.addEventListener('click', function(event){
-    let request = new AjaxRequest();
-    request.setup('GET', 'http://localhost:3000/trade/api/accounts', function(data){
-        let feedback = document.querySelector('.feedback');
-        feedback.innerHTML = JSON.stringify(data);
-    });
-    request.send();
-});
 
 class TradeWindowComponent {
     constructor() {
@@ -173,6 +178,8 @@ class TradeWindowComponent {
         this.eth_price = Number(document.querySelector('.eth-price').value);
         this.ltc_price = Number(document.querySelector('.ltc-price').value);
         this.bch_price = Number(document.querySelector('.bch-price').value);
+
+        this.order_feedback = document.querySelector('.order-feedback');
 
         this.addEvents();
         this.__updateBalances();
@@ -206,10 +213,22 @@ class TradeWindowComponent {
         let request = new AjaxRequest();
         request.setup('POST', 'http://localhost:3000/trade/api/order', function(data){
             console.log(data);
-        });
+            this.__updateFeedback(data);
+        }.bind(this));
         request.send(this.message);
 
         this.__updateBalances();
+    }
+    __updateFeedback(feedback) {
+        feedback = JSON.parse(feedback);
+        if(!Array.isArray(feedback)){
+            //check if message is good - if it has prop message, then its bad
+            if(feedback.hasOwnProperty('message')) {
+                this.order_feedback.innerHTML = "ERROR: " + feedback.message
+                return;
+            }
+            this.order_feedback.innerHTML = feedback.side + ": " + feedback.size + "<br>" + feedback.product_id + ": " + feedback.price;
+        }
     }
     __updateBalances() {
         let request = new AjaxRequest();
@@ -217,7 +236,8 @@ class TradeWindowComponent {
         let eth_bal = document.querySelector('.eth-balance');
         let ltc_bal = document.querySelector('.ltc-balance');
         let bch_bal = document.querySelector('.bch-balance');
-        let money_bal = document.querySelector('.money-balance')
+        let money_bal = document.querySelector('.money-balance');
+        let portfolio_worth = document.querySelector('.portfolio-worth');
 
         request.setup('GET', 'http://localhost:3000/trade/api/accounts', function(data){
             console.log('Returned balances: ', data)
@@ -248,7 +268,6 @@ class SocketClient {
     constructor() {
         // Open a connection
         this.socket = new WebSocket('ws://localhost:8081/');
-        console.log(this.socket);
         //this.init();
         this.TradeWindow = new TradeWindowComponent();
         this.LastPriceComponent = new LastPriceComponent();
@@ -274,7 +293,7 @@ class SocketClient {
     __onMessage(event) {
         let data = JSON.parse(JSON.parse(event.data));
 
-        let trade_history = document.querySelector('.trade-history ul');
+        let trade_history = document.querySelector('.trade-history ol');
 
         if(data.type !== 'match'){
             console.log(data);
@@ -316,29 +335,4 @@ class SocketClient {
 let client = new SocketClient();
 client.init();
 
-//submit_order.addEventListener('click', function(event){
-    
-    // let order_side = document.querySelector('.dropdown').value;
 
-    
-    //console.log(order_side);
-
-    
-    //console.log(order_choice_radio);
-    /*order_choice_radio.forEach(function(radio){
-        console.log("@@@", message);
-    }.bind(message));*/
-    //let order_choice = document.querySelector('.coin-choice').value;
-
-    //console.log(order_price, order_amount, order_side);
-    /*message = {
-        size: order_amount,
-        price: order_price,
-        //side: order_side,
-        //product_id: order_choice,
-    }*/
-    
-    console.log("The msg: ", message);
-    
-/*
-});*/

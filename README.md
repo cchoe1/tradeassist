@@ -46,7 +46,7 @@ Tradeassist is NOT (currently) autonomous--in other words, this software will no
 
 Tradeassist provides tools such as more complex orders, taker fee dodger, portfolio trackers, and more.  The ultimate goal of Tradeassist is to get you away from staring at tickers all day long and doing more productive things with your time, while also translating the logic of your trading strategy into simple directives and orders.  In short, Tradeassist's goal is to make your trading more efficient.
 
-##Advanced Orders (Coming Soon)
+## Advanced Orders (Coming Soon)
 
 Tradeassist comes with advanced orders which allow you to make more sophisticated orders besides the traditional market, limit, or stop loss/limit.  Primitive logic statements can be used in conjunction with a set of filtering and analysis tools to make better trades without the need for constant attention.  
 

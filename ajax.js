@@ -23,9 +23,6 @@ class AjaxRequest {
 		this.httpReq.open(type, url);
 		this.httpReq.setRequestHeader("Content-type", "application/json");
 
-		/*let x_csrf_token = document.getElementsByClassName('csrf-token')[0];
-		this.httpReq.setRequestHeader('X-CSRF-TOKEN', x_csrf_token.getAttribute('content'));
-*/
 		this.httpReq.onreadystatechange = callbackFunc.bind(this);
 	}
 	send(params){

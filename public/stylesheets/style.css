@@ -7,28 +7,60 @@
 **********************************/
 body {
   /* padding: 50px; */
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /* font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; */
+  font-family: 'Roboto', serif;
+  margin: 0;
+  padding: 0;
+  font-size: 10pt;
+}
+.container {
 }
 
 a {
-  color: #00B7FF;
+  color: #fffbee;
 }
 
 nav {
 	border: 1px solid black;
 	display: flex;
 	flex-direction: row;
+	position: fixed;
+	z-index: 9999999;
+	width: 100%;
+	height: 20px;
+	background-color: #668680;
+	top: 0;
+
 }
 nav a {
+	text-decoration: none;
 	flex: 1 1 0;
-	border: 1px solid gray;
+	border: 1px solid #b3c1be;
 	text-align: center;
 }
 .col{
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 }
 .row {
 	display: flex;
 	flex-direction: row;
+	width: 100%;
+}
+.full-width{
+	width: 100%;
+}
+.one-third-width {
+	max-width: 33%;
+}
+
+.ultra-slim {
+	height: 20px;
+}
+.slim {
+	height: 100px;
+}
+.tall {
+	height: 400px;
 }

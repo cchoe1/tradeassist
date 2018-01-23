@@ -3,94 +3,155 @@ extends /layout
 block content
 	link(rel='stylesheet', href='/stylesheets/trade.css')
 
-
-	div(class="trade-window")
-		div(class="row")
-			label Price
-			input(class="order-price" type="text" placeholder="Price")
-		div(class="row")
-			label Amount
-			input(class="order-amount" type="text" placeholder="Amount")
-		//- select(class="dropdown")
-		//- 	option(value="buy") BUY
-		//- 	option(value="sell") SELL
-		//- select(class="coin-choice")
-		//- 	option(value="BTC-USD") BTC-USD
-		//- 	option(value="ETH-USD") ETH-USD
-		//- 	option(value="BCH-USD") BCH-USD
-		//- 	option(value="LTC-USD") LTC-USD
-		div(class="row")
-			div(class="col")
-				label Balance:
-			div(class="col")
-				div(class="money-balance")
-		form(class="dropdown row")
+	div(class="trade-view")
+		div(class="trade-window")
 			div(class="row")
-				label Buy
-				input(type="radio" name="side" value="buy")
-			div(class="row")
-				label Sell
-				input(type="radio" name="side" value="sell")
-		hr
-		form(class="coin-choice")
-			div(class="row")
-				label BTC-USD
-				input(type="radio" name="coin-choice" value="BTC-USD")
-				div(class="col")
-					div(class="btc-balance")
-					div(class="btc-worth")
-			div(class="row")
-				label ETH-USD
-				input(type="radio" name="coin-choice" value="ETH-USD")
-				div(class="col")
-					div(class="eth-balance")
-					div(class="eth-worth")
-			div(class="row")
-				label LTC-USD
-				input(type="radio" name="coin-choice" value="LTC-USD")
-				div(class="col")
-					div(class="ltc-balance")
-					div(class="ltc-worth")
-			div(class="row")
-				label BCH-USD
-				input(type="radio" name="coin-choice" value="BCH-USD")
-				div(class="col")
-					div(class="bch-balance")
-					div(class="bch-worth")
-		button(class="submit-order") Submit order
+				button(class="market-order") Market
+				button(class="limit-order") Limit
+				button(class="stop-order") Stop
 	
-	div(class="trade-body")
-		h1= title
-
-		div(class="row")
-			div(class="component last-trades")
-				h2 Last Traded Prices
-				div(class="row")
-					h3 BTC : $
-					div(class="btc-price")
-					div(class="btc-diff")
-				div(class="row")
-					h3 ETH : $
-					div(class="eth-price")
-					div(class="eth-diff")
-				div(class="row")
-					h3 LTC : $
-					div(class="ltc-price")
-					div(class="ltc-diff")
-				div(class="row")
-					h3 BCC : $
-					div(class="bch-price")
-					div(class="bch-diff")
+			div(class="row")
+				label Price
+				input(class="order-price" type="text" placeholder="Price")
+			div(class="row")
+				label Size
+				input(class="order-amount" type="text" placeholder="Amount")
+			//- select(class="dropdown")
+			//- 	option(value="buy") BUY
+			//- 	option(value="sell") SELL
+			//- select(class="coin-choice")
+			//- 	option(value="BTC-USD") BTC-USD
+			//- 	option(value="ETH-USD") ETH-USD
+			//- 	option(value="BCH-USD") BCH-USD
+			//- 	option(value="LTC-USD") LTC-USD
+			div(class="row")
+				div(class="col")
+					label Cash Balance:
+				div(class="col")
+					div(class="money-balance")
+			div(class="row")
+				div(class="col")
+					label Total Portfolio:
+				div(class="col")
+					div(class="portfolio-worth")
 	
-			div(class="component trade-history")
-				h2 Trade History
-				ul
-			div(class="component exchange-history")
-				h2 Exchange History
-				ol
+			form(class="dropdown row")
+				div(class="row")
+					label Buy
+					input(type="radio" name="side" value="buy")
+				div(class="row")
+					label Sell
+					input(type="radio" name="side" value="sell")
+			hr
+	
+			form(class="coin-choice")
+				div(class="row")
+					label BTC-USD
+					input(type="radio" name="coin-choice" value="BTC-USD")
+					div(class="col")
+						div(class="btc-balance")
+						div(class="btc-worth")
+				div(class="row")
+					label ETH-USD
+					input(type="radio" name="coin-choice" value="ETH-USD")
+					div(class="col")
+						div(class="eth-balance")
+						div(class="eth-worth")
+				div(class="row")
+					label LTC-USD
+					input(type="radio" name="coin-choice" value="LTC-USD")
+					div(class="col")
+						div(class="ltc-balance")
+						div(class="ltc-worth")
+				div(class="row")
+					label BCH-USD
+					input(type="radio" name="coin-choice" value="BCH-USD")
+					div(class="col")
+						div(class="bch-balance")
+						div(class="bch-worth")
+			button(class="submit-order") Submit order
 
-		button(class="test") Test BUtton
-		div(class="feedback")
+			div(class="row order-feedback-panel")
+				div(class="col full-width")
+					h4 Order Feedback
+					div(class="order-feedback")
+
+		div(class="trade-body")
+			//- h1= title
+			div(class="row")
+				div(class="last-trades component ultra-slim full-width")
+					span(class="col")
+						div(class="row")
+							label BTC : $
+							span(class="btc-price")
+							span(class="btc-diff")
+		
+					span(class="col")
+						div(class="row")
+							label ETH : $
+							span(class="eth-price")
+							span(class="eth-diff")
+		
+					span(class="col")
+						div(class="row")
+							label LTC : $
+							span(class="ltc-price")
+							span(class="ltc-diff")
+		
+					span(class="col")
+						div(class="row")
+							label BCC : $
+							span(class="bch-price")
+							span(class="bch-diff")
+	
+			div(class="row")
+				span(class="col one-third-width")
+					h2 Advanced Orders
+					div(class="component tall adv-order-panel")
+						div(class="adv-order")
+							h3 General Options
+							div(class="adv-header row")
+								select(class="adv-order-coin")
+									option(value="BTC-USD") BTC-USD
+									option(value="ETH-USD") ETH-USD
+									option(value="LTC-USD") LTC-USD
+									option(value="BCH-USD") BCH-USD
+								//- select(class="adv-order-side")
+								//- 	option(value="buy") Buy
+								//- 	option(value="sell") Sell
+								select(class="adv-order-type")
+									option(value="market") Market Order
+									option(value="limit") Limit Order
+								select(class="adv-order-actions")
+									option(value="buy") Buy
+									option(value="sell") Sell
+							h3 If...
+							div(class="adv-logic-if row")
+								select(class="adv-order-metric")
+									option(value="price") Price
+									option(value="volume") Volume
+									option(value="sma") Simple Moving Average
+									option(value="macd") MACD Crossover
+								select(class="adv-order-operator")
+									option(value="gt") >
+									option(value="equals") =
+									option(value="lt") <
+								input(type="text" class="adv-order-threshold")
+							button(class="new-adv-condition") New Condition
+								
+
+				span(class="col one-third-width")
+					h2 Trade History
+					div(class="component tall trade-history")
+						ol
+				span(class="col one-third-width")
+					h2 Exchange History
+					div(class=" component tall exchange-history")
+						ol
+	
+			div(class="row")
+			
+
 
 	
 
