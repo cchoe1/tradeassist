@@ -18,14 +18,7 @@ block content
 			div(class="row")
 				label Size
 				input(class="order-amount" type="text" placeholder="Amount")
-			//- select(class="dropdown")
-			//- 	option(value="buy") BUY
-			//- 	option(value="sell") SELL
-			//- select(class="coin-choice")
-			//- 	option(value="BTC-USD") BTC-USD
-			//- 	option(value="ETH-USD") ETH-USD
-			//- 	option(value="BCH-USD") BCH-USD
-			//- 	option(value="LTC-USD") LTC-USD
+
 			div(class="row")
 				div(class="col")
 					label Cash Balance:
@@ -139,54 +132,57 @@ block content
 							span(class="btcd-bch-price")
 							span(class="btcd-bch-diff")
 							span(class="btcd-bch-24-hour-change")
-	
+
+			div(class="row")
+				div(class="component tall adv-order-panel")
+					div(class="tab row")
+						button(class="tablinks adv-new-condition") New Condition
+						button(class="tablinks adv-new-event") New Event
+						button(class="tablinks adv-new-stage") New Stage
+						button(class="tablinks adv-save") Save
+						button(class="tablinks adv-submit") Submit
+						button(class="tablinks adv-clear") Clear
+						//- button(class="tablinks") LTC-BTC
+						//- button(class="tablinks") BCH-BTC
+					div(class="adv-order")
+						h3 General Options
+						div(class="adv-header row")
+							select(class="adv-order-coin")
+								option(value="BTC-USD") BTC-USD
+								option(value="ETH-USD") ETH-USD
+								option(value="LTC-USD") LTC-USD
+								option(value="BCH-USD") BCH-USD
+							//- select(class="adv-order-side")
+							//- 	option(value="buy") Buy
+							//- 	option(value="sell") Sell
+							select(class="adv-order-type")
+								option(value="market") Market Order
+								option(value="limit") Limit Order
+							
+						h3 If...
+						div(class="adv-logic-if row")
+							select(class="adv-order-metric")
+								option(value="price") Price
+								option(value="volume") Volume
+								option(value="sma") Simple Moving Average
+								option(value="macd") MACD Crossover
+							select(class="adv-order-operator")
+								option(value="gt") >
+								option(value="equals") =
+								option(value="lt") <
+							input(type="text" class="adv-order-threshold")
+						
+						h3 Then...
+						div(class="adv-logic-action row")
+							select(class="adv-order-actions")
+								option(value="buy") Buy
+								option(value="sell") Sell
+							input(type="text" class="adv-action-input")
+
 			div(class="row")
 				span(class="col one-third-width")
 					h2 Advanced Orders
-					div(class="component tall adv-order-panel")
-						div(class="tab row")
-							button(class="tablinks adv-new-condition") New Condition
-							button(class="tablinks adv-new-event") New Event
-							button(class="tablinks adv-new-stage") New Stage
-							button(class="tablinks adv-save") Save
-							button(class="tablinks adv-submit") Submit
-							button(class="tablinks adv-clear") Clear
-							//- button(class="tablinks") LTC-BTC
-							//- button(class="tablinks") BCH-BTC
-						div(class="adv-order")
-							h3 General Options
-							div(class="adv-header row")
-								select(class="adv-order-coin")
-									option(value="BTC-USD") BTC-USD
-									option(value="ETH-USD") ETH-USD
-									option(value="LTC-USD") LTC-USD
-									option(value="BCH-USD") BCH-USD
-								//- select(class="adv-order-side")
-								//- 	option(value="buy") Buy
-								//- 	option(value="sell") Sell
-								select(class="adv-order-type")
-									option(value="market") Market Order
-									option(value="limit") Limit Order
-								
-							h3 If...
-							div(class="adv-logic-if row")
-								select(class="adv-order-metric")
-									option(value="price") Price
-									option(value="volume") Volume
-									option(value="sma") Simple Moving Average
-									option(value="macd") MACD Crossover
-								select(class="adv-order-operator")
-									option(value="gt") >
-									option(value="equals") =
-									option(value="lt") <
-								input(type="text" class="adv-order-threshold")
-							
-							h3 Then...
-							div(class="adv-logic-action row")
-								select(class="adv-order-actions")
-									option(value="buy") Buy
-									option(value="sell") Sell
-								input(type="text" class="adv-action-input")
+					
 
 
 				span(class="col one-third-width")
@@ -217,10 +213,7 @@ block content
 						ol(class="tabcontent" id="exchange-history-bch-btc")
 	
 			div(class="row")
-				div(id="additional-info")
-					div(id="total-fees-paid")
-						label Total Fees Paid
-						span 
+			
 
 
 	

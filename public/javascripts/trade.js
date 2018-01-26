@@ -7,81 +7,163 @@ function transition(element, class_name, time) {
     timeout = setTimeout(remove, time);
     element.classList.add(class_name);
 }
-let $ = function(selector) {
-
+function $( cssquery ) {
+    var t = document.querySelectorAll(cssquery);
+    return (t.length === 0) ? false : (t.length === 1) ? Array.prototype.slice.call(t)[0] : Array.prototype.slice.call(t);
 }
-class AdvancedOrder {
-    constructor() {
-        
+
+function openTab(evt, tabName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
     }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+
+
+//gather front end, send to back end
+class AdvancedOrderComponent {
+    constructor() {
+        this.adv_order_container = $('.adv-order-panel');
+        this.initial_adv_order = document.getElementsByClassName('adv-order')[0];
+        this.message = {};
+        this.general = {};
+        this.conditions = {};
+        this.actions = {};
+
+        // return this;
+        this.__init();
+    }
+    __init() {
+        this.__addEvents();
+    }
+    __addEvents() {
+        console.log(this.initial_adv_order);
+    }
+    __grabInputs() {
+
+    }
+    addOrder() {
+
+    }
+
+
 }
 class Persister {
 
 }
 class ExchangeHistoryComponent {
     constructor() {
-        this.history_ul = document.querySelector('.exchange-history ol');
-        this.length = 1000;
-        this.tx_list = [];
-
+        this.length = 30;
+        this.tx_list = {
+            "btc-usd": {
+                view: $('#exchange-history-btc-usd'),
+                transactions: [],
+            },
+            "eth-usd": {
+                view: $('#exchange-history-eth-usd'),
+                transactions: [],
+            },
+            "ltc-usd": {
+                view: $('#exchange-history-ltc-usd'),
+                transactions: [],
+            },
+            "bch-usd": {
+                view: $('#exchange-history-bch-usd'),
+                transactions: [],
+            },
+            "eth-btc": {
+                view: $('#exchange-history-eth-btc'),
+                transactions: [],
+            },
+            "ltc-btc": {
+                view: $('#exchange-history-ltc-btc'),
+                transactions: [],
+            },
+            "bch-btc": {
+                view: $('#exchange-history-bch-btc'),
+                transactions: [],
+            },
+        }
     }
     receive(data) {
         this.__addTransaction(data);
-        //this.__displayTransactions();
     }
     __addTransaction(data) {
-        this.history_ul.innerHTML = "<li>" + "Asset: " + data.product_id + "<br>" + "Side: " + data.side + "<br>" + "Size: " + data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>" + this.history_ul.innerHTML;
-        
-        /*this.tx_list.unshift(data);
-        let length = this.tx_list.length;
-
-        if(length > this.length) {
-            this.tx_list.pop();
-        }*/
-
+        this.tx_list[`${ data.product_id.toLowerCase() }`].transactions.unshift(data);
+        if(this.tx_list[`${ data.product_id.toLowerCase() }`].transactions.length > this.length) {
+            this.tx_list[`${ data.product_id.toLowerCase() }`].transactions.pop();
+        }
+        this.__displayTransactions(this.tx_list[`${ data.product_id.toLowerCase() }`]);
 
     }
-    __displayTransactions() {
-        this.history_ul.innerHTML = '';
+    __displayTransactions(prop) {
+        // this.tx_list[`${ prop.product_id.toLowerCase() }`].view.innerHTML = '';
+        prop.view.innerHTML = '';
+        // this.tx_list[`${ prop.product_id.toLowerCase() }`].transactions.forEach(function(tx) {
+        prop.transactions.forEach(function(tx){
+            let html = "<li>";
+            html += tx.side + ": " + tx.size + " @ " + tx.price;
+            html += "</li>";
 
-        this.tx_list.forEach(function(tx){
-            /*this.history_ul.innerHTML = "<li>" + "Asset: " + tx.product_id + "<br>" + "Side: " + tx.side + "<br>" + "Size: " + tx.size + "<br>" + "Price: " + tx.price + "<br>" + "</li>" + this.history_ul.innerHTML;*/
-            this.history_ul.innerHTML += "<li>" + "Asset: " + tx.product_id + "<br>" + "Side: " + tx.side + "<br>" + "Size: " + tx.size + "<br>" + "Price: " + tx.price + "<br>" + "</li>";
-        
+            prop.view.innerHTML += html;
+
         }.bind(this));
+
+        
     }
 }
 class LastPriceComponent {
     constructor() {
 
-        this.btc_price_div = document.querySelector('.btc-price');
-        this.eth_price_div = document.querySelector('.eth-price');
-        this.ltc_price_div = document.querySelector('.ltc-price');
-        this.bch_price_div = document.querySelector('.bch-price');
+        this.btc_price_div = $('.btc-price');
+        this.eth_price_div = $('.eth-price');
+        this.ltc_price_div = $('.ltc-price');
+        this.bch_price_div = $('.bch-price');
+        this.btcd_eth_price_div = $('.btcd-eth-price');
+        this.btcd_ltc_price_div = $('.btcd-ltc-price');
+        this.btcd_bch_price_div = $('.btcd-bch-price');
 
-        this.btc_diff = document.querySelector(".btc-diff")
-        this.eth_diff = document.querySelector(".eth-diff")
-        this.ltc_diff = document.querySelector(".ltc-diff")
-        this.bch_diff = document.querySelector(".bch-diff")
+        this.btc_diff = $(".btc-diff")
+        this.eth_diff = $(".eth-diff")
+        this.ltc_diff = $(".ltc-diff")
+        this.bch_diff = $(".bch-diff")
+        this.btcd_eth_diff = $(".btcd-eth-diff")
+        this.btcd_ltc_diff = $(".btcd-ltc-diff")
+        this.btcd_bch_diff = $(".btcd-bch-diff")
 
-        this.btc_bal = document.querySelector('.btc-balance');
-        this.eth_bal = document.querySelector('.eth-balance');
-        this.ltc_bal = document.querySelector('.ltc-balance');
-        this.bch_bal = document.querySelector('.bch-balance');
-        this.money_bal = document.querySelector('.money-balance');
+        this.btc_bal = $('.btc-balance');
+        this.eth_bal = $('.eth-balance');
+        this.ltc_bal = $('.ltc-balance');
+        this.bch_bal = $('.bch-balance');
+        this.money_bal = $('.money-balance');
 
-        this.btc_worth = document.querySelector('.btc-worth');
-        this.eth_worth = document.querySelector('.eth-worth');
-        this.ltc_worth = document.querySelector('.ltc-worth');
-        this.bch_worth = document.querySelector('.bch-worth');
+        this.btc_worth = $('.btc-worth');
+        this.eth_worth = $('.eth-worth');
+        this.ltc_worth = $('.ltc-worth');
+        this.bch_worth = $('.bch-worth');
 
-        this.portfolio_worth = document.querySelector('.portfolio-worth');
+        this.portfolio_worth = $('.portfolio-worth');
 
-        console.log("AHHHH", this);
     }
     receive(data) {
         this.__updatePrice(data);
     }
+    //optimize one day...
     __updatePrice(data) {
         if(data.product_id === "BTC-USD") {
             let current = Number(this.btc_price_div.innerHTML);
@@ -161,32 +243,88 @@ class LastPriceComponent {
             this.bch_price_div.innerHTML = data.price;
             this.bch_diff.innerHTML = diff.toFixed(2);
         }
+        else if(data.product_id === "ETH-BTC") {
+            let current = Number(this.btcd_eth_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
+                transition(this.btcd_eth_price_div, "traded-up", 500);
+                transition(this.btcd_eth_diff, "traded-up", 500);
+            }
+            else if(current > Number(data.price)){
+                transition(this.btcd_eth_price_div, "traded-down", 500);
+                transition(this.btcd_eth_diff, "traded-down", 500);
+            }
+            else {
+                transition(this.btcd_eth_price_div, 'traded-neutral', 500);
+                transition(this.btcd_eth_diff, 'traded-neutral', 500);
+            }
+            //this.bch_worth.innerHTML = "$" + (Number(this.bch_bal.innerHTML) * Number(data.price)).toFixed(4);
+            this.btcd_eth_price_div.innerHTML = data.price;
+            this.btcd_eth_diff.innerHTML = diff.toFixed(2);
+        }
+        else if(data.product_id === "LTC-BTC") {
+            let current = Number(this.btcd_ltc_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
+                transition(this.btcd_ltc_price_div, "traded-up", 500);
+                transition(this.btcd_ltc_diff, "traded-up", 500);
+            }
+            else if(current > Number(data.price)){
+                transition(this.btcd_ltc_price_div, "traded-down", 500);
+                transition(this.btcd_ltc_diff, "traded-down", 500);
+            }
+            else {
+                transition(this.btcd_ltc_price_div, 'traded-neutral', 500);
+                transition(this.btcd_ltc_diff, 'traded-neutral', 500);
+            }
+            //this.bch_worth.innerHTML = "$" + (Number(this.bch_bal.innerHTML) * Number(data.price)).toFixed(4);
+            this.btcd_ltc_price_div.innerHTML = data.price;
+            this.btcd_ltc_diff.innerHTML = diff.toFixed(2);
+        }
+        else if(data.product_id === "BCH-BTC") {
+            let current = Number(this.btcd_bch_price_div.innerHTML);
+            let diff = Number(data.price) - current;
+            if(current < Number(data.price)) {
+                transition(this.btcd_bch_price_div, "traded-up", 500);
+                transition(this.btcd_bch_diff, "traded-up", 500);
+            }
+            else if(current > Number(data.price)){
+                transition(this.btcd_bch_price_div, "traded-down", 500);
+                transition(this.btcd_bch_diff, "traded-down", 500);
+            }
+            else {
+                transition(this.btcd_bch_price_div, 'traded-neutral', 500);
+                transition(this.btcd_bch_diff, 'traded-neutral', 500);
+            }
+            //this.bch_worth.innerHTML = "$" + (Number(this.bch_bal.innerHTML) * Number(data.price)).toFixed(4);
+            this.btcd_bch_price_div.innerHTML = data.price;
+            this.btcd_bch_diff.innerHTML = diff.toFixed(2);
+        }
 
         let total_val = Number(this.btc_worth.innerHTML.substr(1)) + Number(this.eth_worth.innerHTML.substr(1)) + Number(this.ltc_worth.innerHTML.substr(1)) + Number(this.bch_worth.innerHTML.substr(1)) + Number(this.money_bal.innerHTML.substr(1));
         this.portfolio_worth.innerHTML = "$" + total_val.toFixed(4);
     }
 }
-
 class TradeWindowComponent {
     constructor() {
-        this.submit_order = document.querySelector('.submit-order');
+        this.submit_order = $('.submit-order');
         this.message = {};
         this.order_side_radio = document.getElementsByName('side');
         this.order_choice_radio = document.getElementsByName('coin-choice');
 
-        this.btc_price = Number(document.querySelector('.btc-price').value);
-        this.eth_price = Number(document.querySelector('.eth-price').value);
-        this.ltc_price = Number(document.querySelector('.ltc-price').value);
-        this.bch_price = Number(document.querySelector('.bch-price').value);
+        this.btc_price = Number($('.btc-price').value);
+        this.eth_price = Number($('.eth-price').value);
+        this.ltc_price = Number($('.ltc-price').value);
+        this.bch_price = Number($('.bch-price').value);
 
-        this.order_feedback = document.querySelector('.order-feedback');
+        this.order_feedback = $('.order-feedback');
 
         this.addEvents();
         this.__updateBalances();
     }
     __grabFormValues() {
-        this.order_price = document.querySelector('input.order-price').value;
-        this.order_amount = document.querySelector('.order-amount').value;
+        this.order_price = $('input.order-price').value;
+        this.order_amount = $('.order-amount').value;
 
         this.message.size = this.order_amount;
         this.message.price = this.order_price;
@@ -232,15 +370,15 @@ class TradeWindowComponent {
     }
     __updateBalances() {
         let request = new AjaxRequest();
-        let btc_bal = document.querySelector('.btc-balance');
-        let eth_bal = document.querySelector('.eth-balance');
-        let ltc_bal = document.querySelector('.ltc-balance');
-        let bch_bal = document.querySelector('.bch-balance');
-        let money_bal = document.querySelector('.money-balance');
-        let portfolio_worth = document.querySelector('.portfolio-worth');
+        let btc_bal = $('.btc-balance');
+        let eth_bal = $('.eth-balance');
+        let ltc_bal = $('.ltc-balance');
+        let bch_bal = $('.bch-balance');
+        let money_bal = $('.money-balance');
+        let portfolio_worth = $('.portfolio-worth');
 
         request.setup('GET', 'http://localhost:3000/trade/api/accounts', function(data){
-            console.log('Returned balances: ', data)
+            //console.log('Returned balances: ', data)
             data = JSON.parse(data);
             data.forEach(function(d){
                 if(d.currency === "BTC"){
@@ -264,6 +402,131 @@ class TradeWindowComponent {
         request.send();
     }
 }
+class UserHistoryComponent {
+    constructor() {
+        // this.trade_history = $('.trade-history-list');
+        this.trade_history = $('.trade-history ol');
+        this.total_fees = $('#total-fees-paid span');
+        this.__addEvents();
+        this.import_history_loader = $('.import-history-loader');
+
+        this.__retrieveFromLocalStorage();
+    }
+    receive(data) {
+        console.log("Received trade: ", data);
+        if(data.type === 'received'){
+            this.trade_history.innerHTML += "<li>" + "Type: " + data.type + "<br>" + "Order type: " + data.order_type + "<br>" + "Side: " + data.side + "<br>" + "Size: " +  data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>";
+        }
+        else if(data.type === 'done' ||
+                data.type === 'open') {
+            this.trade_history.innerHTML += "<li>" + 'Type: ' + data.type + "<br>" + "Side: " + data.side + "<br>" + "Price point: " + data.price + "<br>" + "Remaining size: " + data.remaining_size + "<br>" + "Reason: " + data.reason + "</li>";
+        }
+    }
+    __addEvents() {
+        let import_btn = $("button.import-history");
+        import_btn.addEventListener('click', this.__getHistory.bind(this));
+    }
+    //clear local storage upon doing this and then write to view
+    __getHistory() {
+        let confirmed = confirm("This may take a second...");
+        if(confirmed){
+            this.import_history_loader.style.visibility = 'visible';
+            let history_request = new AjaxRequest();
+            history_request.setup('GET', 'http://localhost:3000/trade/api/fills', this.__updateView.bind(this));
+            history_request.send();
+            localStorage.trade_history = '';
+        }
+    }
+    __updateView(res) {
+        this.import_history_loader.style.visibility = 'hidden';
+
+        res = JSON.parse(res);
+        console.log("Eyy", res);
+        
+        this.trade_history.innerHTML = '';
+        res.forEach(function(c){
+            this.trade_history.innerHTML += "<li>" + c.side + ": " + c.liquidity + ": " + c.size + " " + c.product_id + " @ " + c.price + "</li>";
+        }.bind(this));
+
+        let fees = this.__findTotalFees(res);
+        this.total_fees.innerHTML = "$" + fees;
+        this.__storeToLocalStorage();
+    }
+    __retrieveFromLocalStorage() {
+        this.trade_history.innerHTML = localStorage.trade_history;
+        this.total_fees.innerHTML = "$" + localStorage.total_fees_paid;
+    }
+    __storeToLocalStorage() {
+        localStorage.trade_history = this.trade_history.innerHTML;
+        localStorage.total_fees_paid = this.total_fees.innerHTML.substr(1);
+    }
+    __findTotalFees(orders) {
+        let total = 0;
+        orders.forEach(function(order){
+            total += Number(order.fee);
+        });
+        console.log(total);
+        return total;
+    }
+}
+class TickerComponent {
+    constructor() {
+        this.btc_price_24h = $('.btc-24-hour-change')
+        this.eth_price_24h = $('.eth-24-hour-change')
+        this.ltc_price_24h = $('.ltc-24-hour-change')
+        this.bch_price_24h = $('.bch-24-hour-change')
+        this.ethbtc_price_24h = $('.btcd-eth-24-hour-change')
+        this.ltcbtc_price_24h = $('.btcd-ltc-24-hour-change')
+        this.bchbtc_price_24h = $('.btcd-bch-24-hour-change')
+    }
+    receive(data) {
+        // data = JSON.parse(data);
+        let coin = data.product_id;
+        let view, current_price_container, params;
+
+        if (coin === "BTC-USD") {
+            view = this.btc_price_24h;
+            current_price_container = $('.btc-price');
+        }
+        else if (coin === "ETH-USD") {
+            view = this.eth_price_24h;
+            current_price_container = $('.eth-price');
+        }
+        else if (coin === "LTC-USD") {
+            view = this.ltc_price_24h;
+            current_price_container = $('.ltc-price');
+        }
+        else if (coin === "BCH-USD") {
+            view = this.bch_price_24h;
+            current_price_container = $('.bch-price');
+        }
+        else if(coin === 'ETH-BTC') {
+            view = this.ethbtc_price_24h;
+            current_price_container = $('.btcd-eth-price');
+        }
+        else if(coin === 'LTC-BTC') {
+            view = this.ltcbtc_price_24h;
+            current_price_container = $('.btcd-ltc-price');
+        }
+        else if(coin === 'BCH-BTC') {
+            view = this.bchbtc_price_24h;
+            current_price_container = $('.btcd-bch-price');
+        }
+
+
+        let current_price = this.__getCurrentPrice(current_price_container);
+        this.__updateView(view, data, current_price);
+    }
+    __getCurrentPrice(currency_container) {
+        let element = currency_container;
+        return Number(element.innerHTML);
+    }
+    __updateView(view, data, current_price) {
+        // view.innerHTML = data;
+        view.innerHTML = ((current_price - Number(data.open_24h)) / Number(data.open_24h) * 100).toFixed(2) + "%";
+    }
+
+}
 class SocketClient {
     constructor() {
         // Open a connection
@@ -272,53 +535,52 @@ class SocketClient {
         this.TradeWindow = new TradeWindowComponent();
         this.LastPriceComponent = new LastPriceComponent();
         this.ExchangeHistoryComponent = new ExchangeHistoryComponent();
-
+        this.UserHistoryComponent = new UserHistoryComponent();
+        this.AdvancedOrderComponent = new AdvancedOrderComponent();
+        this.TickerComponent = new TickerComponent();
     }
     init() {
         this.socket.onopen = this.__onOpen.bind(this);
         this.socket.onmessage = this.__onMessage.bind(this);
         this.socket.onerror = this.__onError.bind(this);
         this.socket.onclose = this.__onClose.bind(this);
-        console.log(this.socket);
         
         // Close the connection when the window is closed
         window.addEventListener('beforeunload', () => this.socket.close());
     }
     __onOpen() {
         // send data to the server
-        console.log("Connected to web socket server!");
-        var json = JSON.stringify({ message: 'Hello, from the client ' });
+        console.log("Connected to web socket server...");
+        var json = JSON.stringify({ message: 'Client accessed socket...' });
         this.socket.send(json);
     }
     __onMessage(event) {
         let data = JSON.parse(JSON.parse(event.data));
 
-        let trade_history = document.querySelector('.trade-history ol');
 
-        if(data.type !== 'match'){
-            console.log(data);
+        if(data.type !== 'match' || 
+            data.type !== 'ticker'){
+            this.TickerComponent.receive(data);
         }
         if(data.type === 'match'){
             this.LastPriceComponent.receive(data);
             this.ExchangeHistoryComponent.receive(data);
         }
         else if(data.type === 'received'){
-            console.log("@@@@@@@@@@@@@@@@@@@@\n\n\n@@@@@@@@@@@@@@@@@\n\n\n", data);
-            trade_history.innerHTML += "<li>" + "Type: " + data.type + "<br>" + "Order type: " + data.order_type + "<br>" + "Side: " + data.side + "<br>" + "Size: " +  data.size + "<br>" + "Price: " + data.price + "<br>" + "</li>";
+            this.UserHistoryComponent.receive(data);
         }
         else if(data.type === 'done' ||
                 data.type === 'open') {
-            console.log("@@@@@@@@@@@@@@@@@@@@\n\n\n@@@@@@@@@@@@@@@@@\n\n\n", data);
-            trade_history.innerHTML += "<li>" + 'Type: ' + data.type + "<br>" + "Side: " + data.side + "<br>" + "Price point: " + data.price + "<br>" + "Remaining size: " + data.remaining_size + "<br>" + "Reason: " + data.reason + "</li>";
+            this.UserHistoryComponent.receive(data);
         }
     }
     __onError(event) {
-        this.socket.close();
         console.log("ERROR WITH CLIENT SOCKET!", event);
+        this.socket.close();
     }
     __onClose() {
-        this.socket.close();
         console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ CLOSING @@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        this.socket.close();
         
     }
 }
@@ -334,5 +596,4 @@ class SocketClient {
 
 let client = new SocketClient();
 client.init();
-
 

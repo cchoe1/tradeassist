@@ -2,10 +2,11 @@
 class Logger {
     constructor(message) {
         this.fs = require('fs');
-        this.message = message;
+        this.message = message || '';
         this.name;
         this.start = "START>>>>>>>>>>>>>>>>>>>>"
         this.end = ">>>>>>>>>>>>>>>>>>>>>>END"
+        this.timestamp = Date(Date.now()).toString();
 
         this.error_msg = this.start;
         return this;
@@ -17,9 +18,11 @@ class Logger {
         this.__write();
         return this;
     }
+    // Creates a general error message in the log
     error(name, message) {
         message ? this.message = message : message = null;
         this.name = name;
+        console.log(this.timestamp, this.name, this.message);
 
         this.__write();
         return this;
@@ -27,8 +30,8 @@ class Logger {
     __write() {
         let message = this.message;
         let separator = '---------';
-        let timestamp = Date(Date.now()).toString();
-        let log = this.start + "\n" + "- " + timestamp + ", " + `<<${this.name}>>` + "\n" + message + "\n" + this.end + "\n";
+        
+        let log = this.start + "\n" + "- " + this.timestamp + ", " + `<<${this.name}>>` + "\n" + message + "\n" + this.end + "\n";
 
         let stream = this.fs.createWriteStream('errors.log', {flags:'a'});
         stream.write(log);
@@ -43,24 +46,14 @@ class ServerSideRequest {
         if(exchange === 'GDAX'){
             this.hostname = 'api.gdax.com';
         }
-        //this.httpReq = new XMLHttpRequest();
-
     }
-    setup(type, url, func, args) {
-        func = func || function() { };
-        args = args || [];
-
-        function callbackFunc() {
-            
-        }
+    setup(type, url, func) {
         url = url;
 
         this.options.hostname = this.hostname;
         this.options.port = 443;
         this.options.path = url;
         this.options.method = type;
-
-
 
         this.req = this.https.request(this.options, function(res){
             let response = '';
@@ -71,6 +64,7 @@ class ServerSideRequest {
             //when response ends, callback func is called and full response is sent with it
             res.on('end', () => {
                 console.log("request ended");
+
                 func(response);
             });
         });
@@ -78,7 +72,8 @@ class ServerSideRequest {
         this.req.setHeader('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36');
 
         this.req.on('error', (e) => {
-            console.log("Error with REST API Request...", e);
+            console.log("Error with REST API Request...", e, Date(Date.now()).toString());
+            new Logger().error("REST API ERROR", e);
         });
 
     }
@@ -94,7 +89,7 @@ class ServerSideRequest {
 
     }
 }
-
+// Require ServerSideRequest();
 class GDAXAPI {
     constructor() {
         this.request = new ServerSideRequest('GDAX');
@@ -102,7 +97,7 @@ class GDAXAPI {
         this.response = '';
     }
     __private(endpoint, method, body) {
-        body = JSON.stringify(body) || '';
+        body = body || '';
         var crypto = require('crypto');
         let data = this.__readConfig();
 
@@ -112,11 +107,13 @@ class GDAXAPI {
 
         let what, key, hmac, final = null;
 
-        if(method === 'GET') {
+        if(body === '') {
             what = timestamp + method + requestPath;
         }
         else {
-            //let msg = JSON.stringify(body);
+            // body = JSON.parse(body);
+            // body = typeof body === 'Object' ? JSON.parse(body) : body;
+            console.log("EEEK", body);
             what = timestamp + method + requestPath + body;
         }
         key = Buffer(data[0], 'base64');
@@ -131,6 +128,16 @@ class GDAXAPI {
 
         return this;
     }
+    fills(endpoint, callback) {
+        callback = callback || function() { };
+        // let endpoint = '/fills?before=24570240';
+        
+        console.log("ENDPOINT = ", endpoint);
+        this.request.setup('GET', endpoint, callback);
+        this.__private(endpoint, 'GET');
+        this.request.send();
+
+    }
     order(side, price, amount, product_id, callback) {
         callback = callback || function() { };
 
@@ -139,11 +146,13 @@ class GDAXAPI {
             price: price,
             side: side,
             type: 'limit',
-            product_id: product_id
+            product_id: product_id,
+            post_only: 'true'
         };
+        console.log(msg);
         let endpoint = '/orders';
         this.request.setup('POST', endpoint, callback);
-        this.__private(endpoint, 'POST', msg);
+        this.__private(endpoint, 'POST', JSON.stringify(msg));
 
         this.request.send(msg);
     }
@@ -156,11 +165,6 @@ class GDAXAPI {
         this.__private(endpoint, 'GET');
 
         this.request.send();
-
-
-    }
-    __callback(res) {
-        console.log("YAY THIS WORKS", res.toString());
     }
     __readConfig() {
         let config_array = [];
@@ -193,9 +197,8 @@ class GDAXAPI {
         config_array.shift();
         return config_array;
     }
-
 }
-
+// Require Logger();
 // socket specific to GDAX for creating and listening to info
 class GDAXSocket {
     constructor() {
@@ -243,6 +246,7 @@ class GDAXSocket {
 
         return final;
     }
+    //fix this to be smarter and better
     __readConfig() {
         let config_array = [];
         let config = this.fs.readFileSync('./keys.conf', (err, data) => data);
@@ -275,9 +279,8 @@ class GDAXSocket {
         var crypto = require('crypto');
         let data = this.__readConfig();
 
-        //data = this.__readConfig(data);
-
         let timestamp = Date.now() / 1000;
+        //endpoint for verification for any websocket connection
         let requestPath = '/users/self/verify';
         
         let method = 'GET';
@@ -287,51 +290,39 @@ class GDAXSocket {
 
         let final = hmac.update(what).digest('base64');
 
-
         this.__sock_message.signature = final;
         this.__sock_message.key = data[1];
         this.__sock_message.passphrase = data[2];
         this.__sock_message.timestamp = timestamp;
 
         return this;
-
     }
     __composeMessage() {
-        /*this.__sock_message = {
-            "type": "subscribe",
-            //"product_ids": this.products,
-            "channels": this.channels
-        }*/
         this.__sock_message.type = 'subscribe';
         this.__sock_message.channels = this.channels;
         return this;
     }
     setup() {
-        //this.__sock_message = {};
         this.__composeMessage();
         return this;
-
     }
     
     beginAndListen(callback) {
-        let stream = new StreamHandler();
-        //the fork in the road -- one data stream goes to the front end and the other stays in the back end
-        //  to be used further
         function router(data) {
-            // callback() is supplied from the Web Server that calls this func - used fo front end
+            // console.log(data);
             callback(data);
-
-            // StreamHandler() is used by the back end
-            stream.listen(data);
         }
-        console.log("Began and listening...", this.__sock_message);
         this.webSock.on('open', function open() {
             try{
-                this.webSock.send(JSON.stringify(this.__sock_message));
+                this.webSock.send(JSON.stringify(this.__sock_message), function(error) {
+                    new Logger().socketError(error);
+                    console.log("Error sending message to client...", error);
+
+                }.bind(this));
                 this.webSock.on('message', data => router(data));
             }
             catch(e) {
-                console.log("ERROR! Appended to log", e);
+                console.log("ERROR! Appended to log", e, Date(Date.now()).toString());
                 new Logger(e).socketError();
             }
         }.bind(this))
@@ -340,80 +331,7 @@ class GDAXSocket {
         return data;
     }
 }
-//this class is the router -- it receives all of the updates from our CLIENT which listens to GDAX
-// this class is responsible for triggering other classes that have their own responsibilities
-class StreamHandler {
-    constructor() {
-        console.log("starting stream...");
-        this.marketPriceManager = new MarketPrice();
-        this.userHistoryManager = new UserHistory();
-        //this.init();
-    }
-    listen(data) {
-        data = JSON.parse(data);
-        try{
-            // rough check to see if its a match or user event
-            if (data.type === "match") {
-                this.marketPriceManager.updatePrice(data);
-            }
-            else if(data.type === 'open' ||
-                    data.type === 'received' ||
-                    data.type === 'done'){
-                this.userHistoryManager.receive(data);
-            }
-            else if(data.type === 'last_match' ||
-                    data.type === 'subscribe') {
-                //console.log("Some info: ", data);
-            }
-            return data;
-        }
-        catch(e) {
-        }
 
-    }
-}
-class MarketPrice {
-    constructor() {
-        console.log('listening for prices');
-        this.ETH = 0;
-        this.BTC = 0;
-        this.LTC = 0;
-        this.BCC = 0;
-    }
-    updatePrice(data) {
-        let coin = data.product_id;
-
-        if (coin === "BTC-USD") {
-            this.BTC = data.price;
-            console.log("BTC = $", this.BTC);
-        }
-        else if (coin === "ETH-USD") {
-            this.ETH = data.price;
-            console.log("ETH = $", this.ETH);
-        }
-        else if (coin === "LTC-USD") {
-            this.LTC = data.price;
-            console.log("LTC = $", this.LTC);
-        }
-        else if (coin === "BCH-USD") {
-            this.BCC = data.price;
-            console.log("BCH = $", this.BCC);
-        }
-    }
-
-}
-class UserHistory {
-    constructor() {
-        console.log('listening for user history');
-        this.fs = require('fs');
-    }
-    receive(object) {
-        let stream = this.fs.createWriteStream('history.conf', {flags:'a'});
-        stream.write(JSON.stringify(object) + "\n");
-        stream.end();
-    }
-
-}
 
 /**********************************************************************
 *
@@ -439,4 +357,5 @@ sock.begin();*/
 module.exports = {
     GDAXSocket: GDAXSocket,
     GDAXAPI: GDAXAPI,
+    Logger: Logger,
 }

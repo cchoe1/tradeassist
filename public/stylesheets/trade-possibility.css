@@ -16,9 +16,9 @@
     display: flex;
     flex-direction: row;
 }
-.row .col h2, h3 {
+/* .row .col h2, h3 {
 	text-align: center;
-}
+} */
 /* 
 	Advanced Orders...
  */
@@ -55,7 +55,6 @@ option {
 .trade-window .row{
 	align-items: center;
 	justify-content: space-between;
-	width: 100%;
 
 }
 .trade-window input{
@@ -116,10 +115,7 @@ option {
 	width: 100%;
 
 }
-.trade-body .row {
-	display: flex;
-	flex-direction: row;
-}
+
 .trade-body .row span.col{
 	/*overflow: hidden;*/
 	width: 100%;
@@ -179,13 +175,21 @@ option {
 	
 **********************************/
 button.import-history {
-    left: 155px;
+    /*left: 155px;*/
+    top: -55px;
+    left: 90%;
     color: #0011ff;
     font-size: 8pt;
+    display: inline;
 }
 .trade-history li {
 	border: 1px solid black;
 	font-size: 8pt;
+}
+.trade-history ol{ 
+	height: 300px;
+	overflow-y: auto;
+	margin-top: -20px;
 }
 /* .exchange-history {
 	border: 2px solid black;
@@ -195,7 +199,8 @@ button.import-history {
  */
 .import-history-loader {
 	position: relative;
-	left: 150px;
+	left: 87%;
+	top: -38px;
 }
 
 /********************************** 
@@ -207,7 +212,7 @@ button.import-history {
 	font-size: 8pt;
 }
 .exchange-history-body {
-	
+	height: 300px;
 }
 .col .tab {
 }
@@ -233,7 +238,7 @@ button.import-history {
 
 
 button.tablinks {
-	font-size: 6pt;
+	font-size: 8pt;
 	/*width: 40px;*/
 	/*height: 20px;*/
 	text-align: center;

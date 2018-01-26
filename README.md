@@ -46,11 +46,21 @@ Tradeassist is NOT (currently) autonomous--in other words, this software will no
 
 Tradeassist provides tools such as more complex orders, taker fee dodger, portfolio trackers, and more.  The ultimate goal of Tradeassist is to get you away from staring at tickers all day long and doing more productive things with your time, while also translating the logic of your trading strategy into simple directives and orders.  In short, Tradeassist's goal is to make your trading more efficient.
 
-## Advanced Orders (Coming Soon)
+## Regular Order Panel
+
+Just in case you need it, an order panel is provided on the left hand side of the Trade page.  It makes use of standard REST API endpoints to quickly send trades.  ** CURRENTLY ONLY LIMIT ORDERS WORK **
+
+## Advanced Orders (ALPHA - NOT WORKING / VERY UNSTABLE - **DO NOT USE**)
 
 Tradeassist comes with advanced orders which allow you to make more sophisticated orders besides the traditional market, limit, or stop loss/limit.  Primitive logic statements can be used in conjunction with a set of filtering and analysis tools to make better trades without the need for constant attention.  
 
+## History Importer
+
+GDAX makes available your entire trading history through their REST API endpoint.  This data can be collected and then analyzed at a deeper level to gain valuable insight into your trading history.  You can import data on the Trade page in the 'Trade History' panel.
+
 # FURTHER NOTES
+
+**THIS PROGRAM DOES NOT REQUIRE ANY MANAGE OR TRANSFER PERMISSIONS FROM YOUR API KEY.  PLEASE DO NOT GENERATE A KEY WITH THESE PERMISSIONS FOR USE IN THIS APPLICATION, YOU ONLY NEED TRADING AND VIEW PERMISSIONS**
 
 Public facing interfaces may be created through the use of port forwarding.  Please be advised that this system may not be entirely secured at the time of this writing and that you should be cautious when opening ports that allows you to connect to this UI from the outside internet.  With a default installation, your UI is automatically separated from the outside world and mostly secure.  Please understand the risks of port forwarding and opening your internet to the outside world.  This software will recognize changes to your account and run seamlessly despite your being outside of the local network so it is not entirely necessary to open this interface to the public internet.
 

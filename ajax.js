@@ -32,6 +32,7 @@ class AjaxRequest {
 	}
 }
 
+
 /*module.exports = {
 	AjaxRequest: AjaxRequest
 }*/

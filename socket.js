@@ -3,10 +3,15 @@ class WebSocketServer {
         this.WebSocket = require('ws');
         this.url = require('url');
         this.socketTools = require('./gdax.js');
+        this.fs = require('fs');
         
         this.wss = new this.WebSocket.Server({ 'port': 8081 });
 
         this.__init();
+
+        this.marketPriceManager = new MarketPrice();
+        this.userHistoryManager = new UserHistory();
+        this.tickerManager = new Ticker();
     }
     makeRequest() {
         this.GDAXAPI = new this.socketTools.GDAXAPI();
@@ -15,15 +20,46 @@ class WebSocketServer {
     __handleData(data) {
         var broadcast = function(data) {
             var json = JSON.stringify(data);
-            
             this.wss.clients.forEach(function each(client) {
-                client.send(json);
-            });
+                if(client.readyState === 1){
+                    client.send(json);
+                }
+            }.bind(this));
         }.bind(this);
+
+
+        
+
+        if (data.type === "match") {
+            this.marketPriceManager.updatePrice(data);
+        }
+        else if(data.type === 'open' ||
+                data.type === 'received' ||
+                data.type === 'done'){
+            this.userHistoryManager.receive(data);
+        }
+        else if(data.type === 'subscriptions') {
+            console.log("Subbed: ", data);
+        }
+        else if(data.type === 'ticker') {
+            this.tickerManager.receive(data);
+            console.log(data);
+        }
+        else if(data.type === 'last_match') {
+            //nothing
+        }
+        else if(data.type === 'custom'){
+            
+        }
+        else {
+            //console.log("Uh.....", data)
+        }
+
         broadcast(data);
 
     }
     __init() {
+        this.startGDAX();
         this.wss.on('connection', function (ws, req) {
             const location = this.url.parse(req.url, true);
             // You might use location.query.access_token to authenticate or share sessions
@@ -32,20 +68,24 @@ class WebSocketServer {
             ws.on('message', function incoming(message) {
                 console.log('Received from client: %s', message);
             });
-            ws.on('error', function () {
+            ws.on('error', function (error) {
+                new this.socketTools.Logger().error("Web Socket Main Server Error", error);
+                console.log("Closing @ ", Date(Date.now()).toString());
                 ws.close();
-                console.log("uh oh! error!");
             });
             ws.on('close', function close() {
+                console.log('Client window closed at ', Date(Date.now()).toString());
                 ws.close();
-                ws = null;
                 if(this.GDAXSocket){
                     this.GDAXSocket.close();
                 }
-                console.log('user has disconnected! bye bye!');
+                if(ws.readyState === 1){
+
+                }
+                else{
+                }
             }.bind(this));
 
-            this.startGDAX();
             
         }.bind(this));
     }
@@ -54,7 +94,9 @@ class WebSocketServer {
         
         this.GDAXSocket.private();
         this.GDAXSocket.sub('user', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD", "ETH-BTC", "LTC-BTC", "BCH-BTC"]);
-        this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD"]);
+        this.GDAXSocket.sub('matches', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD", "ETH-BTC", "LTC-BTC", "BCH-BTC"]);
+        // this.GDAXSocket.sub('matches', ["BCH-BTC"]);
+        this.GDAXSocket.sub('ticker', ['BTC-USD', "ETH-USD", "LTC-USD", "BCH-USD", "ETH-BTC", "LTC-BTC", "BCH-BTC"]);
         this.GDAXSocket.setup();
         
         //this.GDAXSocket.begin();
@@ -62,10 +104,103 @@ class WebSocketServer {
     }
 }
 
+
+
+
+
+/******************************************
+*
+* Manipulating stream data below
+*
+*
+*******************************************/
+class Ticker {
+    constructor() {
+        console.log("Listening for ticker");
+    }
+    receive(data) {
+        //data = JSON.parse(data);
+
+        console.log("Product: ", data.product_id, "Best bid: ", data.best_bid, "Best Ask: ", data.best_ask);
+    }
+}
+class MarketPrice {
+    constructor() {
+        console.log('listening for prices');
+        this.ETH = 0;
+        this.BTC = 0;
+        this.LTC = 0;
+        this.BCH = 0;
+        this.ETH_to_BTC = 0;
+        this.LTC_to_BTC = 0;
+        this.BCH_to_BTC = 0;
+    }
+    updatePrice(data) {
+        let coin = data.product_id;
+
+        if (coin === "BTC-USD") {
+            this.BTC = data.price;
+            console.log("BTC = $", this.BTC, "Sz: ", data.size, "<<", data.side, ">>");
+        }
+        else if (coin === "ETH-USD") {
+            this.ETH = data.price;
+            console.log("ETH = $", this.ETH, "Sz: ", data.size, "<<", data.side, ">>");
+        }
+        else if (coin === "LTC-USD") {
+            this.LTC = data.price;
+            console.log("LTC = $", this.LTC, "Sz: ", data.size, "<<", data.side, ">>");
+        }
+        else if (coin === "BCH-USD") {
+            this.BCH = data.price;
+            console.log("BCH = $", this.BCH, "Sz: ", data.size, "<<", data.side, ">>");
+        }
+        else if(coin === 'ETH-BTC') {
+                // console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", (((data.price * this.BTC) - this.ETH) / this.ETH) * 100);
+                console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", this.ETH);
+        }
+        else if(coin === 'LTC-BTC') {
+                // console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", (((data.price * this.BTC) - this.LTC) / this.LTC) * 100);
+                console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", this.LTC);
+        }
+        else if(coin === 'BCH-BTC') {
+                // console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", (((data.price * this.BTC) - this.BCH) / this.BCH) * 100);
+                console.log(data.product_id, "Converted: ", data.price * this.BTC, "% POTENTIAL: ", this.BCH);
+        }
+    }
+}
+class UserHistory {
+    constructor() {
+        console.log('listening for user history');
+        this.fs = require('fs');
+    }
+    receive(object) {
+        let stream = this.fs.createWriteStream('history.conf', {flags:'a'});
+        stream.write(JSON.stringify(object) + "\n");
+        stream.end();
+    }
+    importHistory(data) {
+        console.log('Imported...', data);
+        //data = JSON.parse(data);
+        data.forEach(function(d){
+            let stream = this.fs.createWriteStream('history-clean.conf', {flags:'a'});
+            stream.write(JSON.stringify(d) + "\n");
+            stream.end();
+        }.bind(this));
+        this.__calculateAverage(data);
+
+    }
+    __calculateAverage(orders) {
+        console.log(orders);
+    }
+
+
+}
+
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 module.exports = {
-    WebSocketServer: WebSocketServer
+    WebSocketServer: WebSocketServer,
+    UserHistory: UserHistory,
 }

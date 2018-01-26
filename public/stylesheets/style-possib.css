@@ -23,7 +23,7 @@ body {
 }
 
 a {
-  color: #fffbee;
+    color: #fffbee;
 }
 
 nav {
@@ -44,15 +44,16 @@ nav a {
 	border: 1px solid #b3c1be;
 	text-align: center;
 }
+.even-width {
+	flex: 1 1 0;
+}
 .col{
 	display: flex;
-	flex-direction: column;
-	height: 100%;
+	flex-direction: row;
+	/*height: 100%;*/
 }
 .row {
-	display: flex;
-	flex-direction: row;
-	max-width: 100%;
+	width: 100%;
 }
 .full-width{
 	width: 100%;
@@ -60,6 +61,12 @@ nav a {
 .one-third-width {
 	/*max-width: 33%;*/
 	max-width: 33.33%;
+}
+.two-third-width {
+	width: 66.66%;
+}
+.one-half-width {
+	width: 50%;
 }
 
 .ultra-slim {
@@ -127,7 +134,7 @@ button.raw {
     display: none;
     border-top: none;
 }
-.row input[type="button" i], .row input[type="submit" i], .row input[type="reset" i], .row input[type="file" i]::-webkit-file-upload-button, .rowbutton {
+.component .tab input[type="button" i], .component .tab input[type="submit" i], .component .tab input[type="reset" i], .component .tab input[type="file" i]::-webkit-file-upload-button, .component .tab button {
 	align-items: inherit;
 	flex: 1 1 0;
 }
