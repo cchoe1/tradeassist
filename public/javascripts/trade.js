@@ -440,8 +440,8 @@ class UserHistoryComponent {
     __updateView(res) {
         this.import_history_loader.style.visibility = 'hidden';
 
-        res = JSON.parse(res);
         console.log("Eyy", res);
+        res = JSON.parse(res);
         
         this.trade_history.innerHTML = '';
         res.forEach(function(c){

@@ -65,23 +65,23 @@ router.get('/trade/api/fills', function(req, res, next) {
     				// Pass response to server for handling...
 					let combined = [];
 
-					totalObj.forEach(function(r){
+					/*totalObj.forEach(function(r){
         			    r.forEach(function(trade) {
         			        combined.push(trade);
         			    }.bind(this));
         			    combined.sort(function(a,b){
         			        return new Date(b.created_at) - new Date(a.created_at);
         			    });
-        			}.bind(this));
+        			}.bind(this));*/
 
 					let UserHistory = new SocketMiddleware.UserHistory();
-					UserHistory.importHistory(totalObj);
+					combined = UserHistory.importHistory(totalObj);
+					console.log("EEEK", combined);
 					res.json(combined);
     				return;
     			}
     			else {
     				i++;
-    				console.log("i = ", i);
     				let elseEndpoint = '/fills?product_id=' + coins[i];// + '&before=' + trade_id;
 
     				setTimeout(function(elseEndPoint) {

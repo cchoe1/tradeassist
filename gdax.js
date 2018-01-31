@@ -149,6 +149,7 @@ class GDAXAPI {
             product_id: product_id,
             post_only: 'true'
         };
+        
         console.log(msg);
         let endpoint = '/orders';
         this.request.setup('POST', endpoint, callback);
