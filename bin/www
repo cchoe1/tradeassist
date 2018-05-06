@@ -1,101 +1,66 @@
-#!/usr/bin/env node
+// const express = require('./express');
+// const appjs = require('../app');
+const app_js = require('../resources/app/app');
+// const express = require('express');
+const {app, BrowserWindow} = require('electron');
+const path = require('path');
+const url = require('url');
 
-/**
- * Module dependencies.
- */
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let win;
+function createWindow () {
+  // Create the browser window.
+  // express();
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    autoHideMenuBar: true,
+    useContentSize: true,
+    resizable: false,
+  });
 
-var app = require('../app');
-var debug = require('debug')('tradeassist:server');
-var http = require('http');
+  // and load the index.html of the app.
+  // win.loadURL(url.format({
+  //   pathname: path.join(__dirname, '../public/home.html'),
+  //   protocol: 'file:',
+  //   slashes: true
+  // }));
+  win.loadURL('http://localhost:3000/');
 
+  // Open the DevTools.
+  // win.webContents.openDevTools();
 
-/**
- * Get port from environment and store in Express.
- */
+  // Emitted when the window is closed.
+  win.on('closed', () => {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    win = null
+  })
+}
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', createWindow);
 
-app.use(function (req, res) {
-    res.send({ msg: "hello" });
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+  // On macOS it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+})
+
+app.on('activate', () => {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (win === null) {
+    createWindow();
+  }
 });
 
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-// require in the WebSocketServer module which sets up the websocket backend server
-//  WebSocketServer() also implements the back-end client servers which pull data from exchanges
-//  all data is routed through WebSocketServer before it is either parsed 
-var WSS = require('../socket.js');
-const wss = new WSS.WebSocketServer();
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
-
-/**
- * Event listener for HTTP server "error" event.
- */
-
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.

@@ -1,21 +1,23 @@
 {
   "name": "tradeassist",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Trade Assist application for use with GDAX",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ./bin/www"
   },
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.15.5",
-    "fs": "0.0.1-security",
-    "jade": "~1.11.0",
-    "lowdb": "^1.0.0",
-    "morgan": "~1.9.0",
-    "python-shell": "^0.4.0",
-    "serve-favicon": "~2.4.5",
-    "ws": "^4.0.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cchoe1/tradeassist.git"
+  },
+  "author": "Calvin Choe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cchoe1/tradeassist/issues"
+  },
+  "homepage": "https://github.com/cchoe1/tradeassist#readme",
+  "devDependencies": {
+    "electron": "^1.8.4"
   }
 }
